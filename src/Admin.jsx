@@ -635,14 +635,52 @@ function StoreSection({ manifest, setManifest, saveManifest }) {
 
 // ==================== MAIN ADMIN PANEL ====================
 
+const adminResponsiveCSS = `
+  .admin-layout { display: flex; min-height: 100vh; }
+  .admin-sidebar {
+    width: 220px; flex-shrink: 0; display: flex; flex-direction: column;
+    background-color: ${C.panelBg}; padding: 24px 0;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .admin-sidebar-overlay { display: none; }
+  .admin-hamburger { display: none; }
+  .admin-content { flex: 1; padding: 32px; overflow-y: auto; max-height: 100vh; }
+  .admin-top-bar { display: none; }
+
+  @media (max-width: 768px) {
+    .admin-sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 1000;
+      width: 260px; transform: translateX(-100%);
+    }
+    .admin-sidebar.open { transform: translateX(0); }
+    .admin-sidebar-overlay {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .admin-sidebar-overlay.open { display: block; }
+    .admin-hamburger {
+      display: flex; align-items: center; gap: 8px;
+      background: none; border: none; cursor: pointer; padding: 0;
+      color: ${C.white}; font-family: 'DM Sans', sans-serif;
+    }
+    .admin-content { padding: 16px; max-height: none; }
+    .admin-top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px; background-color: ${C.panelBg};
+      position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid ${C.borderDark};
+    }
+  }
+`;
+
 export default function AdminPanel() {
   const [token, setToken] = useState(null);
   const [manifest, setManifest] = useState(null);
   const [activeSection, setActiveSection] = useState("portfolio");
   const [saveStatus, setSaveStatus] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Load manifest on login
   useEffect(() => {
     if (!token) return;
     setLoading(true);
@@ -653,6 +691,13 @@ export default function AdminPanel() {
       .then((data) => { setManifest(data); setLoading(false); })
       .catch(() => setLoading(false));
   }, [token]);
+
+  // Lock body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (sidebarOpen) { document.body.style.overflow = "hidden"; }
+    else { document.body.style.overflow = ""; }
+    return () => { document.body.style.overflow = ""; };
+  }, [sidebarOpen]);
 
   const saveManifest = useCallback(async () => {
     setSaveStatus("Saving...");
@@ -672,7 +717,7 @@ export default function AdminPanel() {
   if (!token) return <LoginScreen onLogin={setToken} />;
   if (loading || !manifest) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: C.darkBg, color: C.white }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: C.darkBg, color: C.white, fontFamily: "'DM Sans'" }}>
         Loading...
       </div>
     );
@@ -686,62 +731,106 @@ export default function AdminPanel() {
     { id: "store", label: "Store", icon: "🛒" },
   ];
 
+  const handleSectionClick = (id) => {
+    setActiveSection(id);
+    setSidebarOpen(false);
+  };
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: C.darkBg, fontFamily: "'DM Sans', sans-serif" }}>
-      {/* Sidebar */}
-      <div style={{ width: 220, backgroundColor: C.panelBg, padding: "24px 0", flexShrink: 0, display: "flex", flexDirection: "column" }}>
-        <div style={{ padding: "0 20px", marginBottom: 32 }}>
-          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: C.white }}>
-            527<span style={{ color: C.rust }}>STUDIOS</span>
+    <div style={{ backgroundColor: C.darkBg, fontFamily: "'DM Sans', sans-serif", minHeight: "100vh" }}>
+      <style>{adminResponsiveCSS}</style>
+
+      {/* Mobile top bar */}
+      <div className="admin-top-bar">
+        <button className="admin-hamburger" onClick={() => setSidebarOpen(true)}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ width: 20, height: 2, backgroundColor: C.white }} />
+            <div style={{ width: 20, height: 2, backgroundColor: C.white }} />
+            <div style={{ width: 14, height: 2, backgroundColor: C.white }} />
           </div>
-          <div style={{ fontSize: 10, color: C.medGray, letterSpacing: "0.15em", textTransform: "uppercase" }}>Admin</div>
-        </div>
-
-        <nav style={{ flex: 1 }}>
-          {sections.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setActiveSection(s.id)}
-              style={{
-                display: "flex", alignItems: "center", gap: 10,
-                width: "100%", padding: "12px 20px", border: "none",
-                backgroundColor: activeSection === s.id ? "rgba(193,122,69,0.15)" : "transparent",
-                borderLeft: activeSection === s.id ? `3px solid ${C.rust}` : "3px solid transparent",
-                color: activeSection === s.id ? C.white : C.medGray,
-                cursor: "pointer", fontSize: 14, fontFamily: "'DM Sans'",
-                textAlign: "left", transition: "all 0.2s",
-              }}
-            >
-              <span>{s.icon}</span> {s.label}
-            </button>
-          ))}
-        </nav>
-
-        <div style={{ padding: "0 20px" }}>
+          <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            {sections.find(s => s.id === activeSection)?.label}
+          </span>
+        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {saveStatus && (
-            <div style={{ fontSize: 12, color: saveStatus.includes("✓") ? C.green : C.rust, marginBottom: 12, textAlign: "center" }}>
-              {saveStatus}
-            </div>
+            <span style={{ fontSize: 11, color: saveStatus.includes("✓") ? C.green : C.rust }}>{saveStatus}</span>
           )}
-          <AdminButton onClick={saveManifest} variant="success" fullWidth>Save All</AdminButton>
-          <div style={{ marginTop: 12 }}>
-            <AdminButton onClick={() => { setToken(null); window.location.hash = ""; }} variant="secondary" fullWidth>
-              Logout
-            </AdminButton>
-          </div>
-          <a href="/" style={{ display: "block", textAlign: "center", fontSize: 11, color: C.medGray, marginTop: 16, textDecoration: "none" }}>
-            ← View Public Site
-          </a>
+          <button onClick={saveManifest} style={{
+            padding: "8px 16px", fontSize: 11, fontWeight: 600, letterSpacing: "0.08em",
+            textTransform: "uppercase", backgroundColor: C.green, color: C.white,
+            border: "none", borderRadius: 4, cursor: "pointer", fontFamily: "'DM Sans'",
+          }}>Save</button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div style={{ flex: 1, padding: 32, overflowY: "auto", maxHeight: "100vh" }}>
-        {activeSection === "portfolio" && <PortfolioSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
-        {activeSection === "blog" && <BlogSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
-        {activeSection === "about" && <AboutSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
-        {activeSection === "services" && <ServicesSection manifest={manifest} setManifest={setManifest} saveManifest={saveManifest} />}
-        {activeSection === "store" && <StoreSection manifest={manifest} setManifest={setManifest} saveManifest={saveManifest} />}
+      {/* Sidebar overlay (mobile) */}
+      <div className={`admin-sidebar-overlay ${sidebarOpen ? "open" : ""}`} onClick={() => setSidebarOpen(false)} />
+
+      <div className="admin-layout">
+        {/* Sidebar */}
+        <div className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}>
+          <div style={{ padding: "0 20px", marginBottom: 32, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: C.white }}>
+                527<span style={{ color: C.rust }}>STUDIOS</span>
+              </div>
+              <div style={{ fontSize: 10, color: C.medGray, letterSpacing: "0.15em", textTransform: "uppercase" }}>Admin</div>
+            </div>
+            {/* Close button (visible on mobile only via CSS) */}
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="admin-hamburger"
+              style={{ fontSize: 22, color: C.medGray, padding: "0 4px" }}
+            >×</button>
+          </div>
+
+          <nav style={{ flex: 1 }}>
+            {sections.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => handleSectionClick(s.id)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  width: "100%", padding: "12px 20px", border: "none",
+                  backgroundColor: activeSection === s.id ? "rgba(193,122,69,0.15)" : "transparent",
+                  borderLeft: activeSection === s.id ? `3px solid ${C.rust}` : "3px solid transparent",
+                  color: activeSection === s.id ? C.white : C.medGray,
+                  cursor: "pointer", fontSize: 14, fontFamily: "'DM Sans'",
+                  textAlign: "left", transition: "all 0.2s",
+                }}
+              >
+                <span>{s.icon}</span> {s.label}
+              </button>
+            ))}
+          </nav>
+
+          <div style={{ padding: "0 20px" }}>
+            {saveStatus && (
+              <div style={{ fontSize: 12, color: saveStatus.includes("✓") ? C.green : C.rust, marginBottom: 12, textAlign: "center" }}>
+                {saveStatus}
+              </div>
+            )}
+            <AdminButton onClick={saveManifest} variant="success" fullWidth>Save All</AdminButton>
+            <div style={{ marginTop: 12 }}>
+              <AdminButton onClick={() => { setToken(null); window.location.hash = ""; }} variant="secondary" fullWidth>
+                Logout
+              </AdminButton>
+            </div>
+            <a href="/" style={{ display: "block", textAlign: "center", fontSize: 11, color: C.medGray, marginTop: 16, textDecoration: "none" }}>
+              ← View Public Site
+            </a>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="admin-content">
+          {activeSection === "portfolio" && <PortfolioSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
+          {activeSection === "blog" && <BlogSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
+          {activeSection === "about" && <AboutSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
+          {activeSection === "services" && <ServicesSection manifest={manifest} setManifest={setManifest} saveManifest={saveManifest} />}
+          {activeSection === "store" && <StoreSection manifest={manifest} setManifest={setManifest} saveManifest={saveManifest} />}
+        </div>
       </div>
     </div>
   );

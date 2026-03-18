@@ -19,115 +19,39 @@ const FONTS = `
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 `;
 
-// ==================== DATA ====================
-const portfolioProjects = [
-  {
-    id: 1,
-    title: "Morning Light Memorials",
-    category: "Brand Identity",
-    tags: ["Brand Identity", "Service Design"],
-    description: "A calm, respectful brand identity for a modern funeral service concept emphasizing clarity, warmth, and thoughtful guidance.",
-    featured: true,
-  },
-  {
-    id: 2,
-    title: "Wedding Magazine — Dubon · Albanese",
-    category: "Editorial Design",
-    tags: ["Editorial", "Print"],
-    description: "A custom-designed wedding magazine created as a personal gift, merging editorial structure with personal storytelling into a printed keepsake.",
-    featured: true,
-  },
-  {
-    id: 3,
-    title: "SWAG — Personal Brand Identity",
-    category: "Brand Identity",
-    tags: ["Brand Identity", "Apparel"],
-    description: "A personal brand identity using negative space to abstract a recognizable silhouette into a bold, adaptable mark for social media, apparel, and products.",
-    featured: true,
-  },
-];
+const API_BASE = "https://api.527studios.com";
 
-const services = [
-  {
-    name: "Brand Identity",
-    price: "Starting at $1,500",
-    description: "Complete visual identity including logo, color palette, typography, and brand guidelines.",
-    includes: ["Logo Design & Variations", "Color Palette Development", "Typography Selection", "Brand Guidelines Document", "Business Card Design"],
-    timeline: "2–3 weeks",
+// Fallback data used while manifest loads or if API is unreachable
+const FALLBACK = {
+  portfolio: [],
+  blog: [],
+  about: {
+    headline: "Great design begins with listening",
+    bio: [
+      "I'm a freelance graphic designer who enjoys helping small businesses bring their ideas to life through clear, professional visuals that reflect who they are and what they offer.",
+      "I believe great design begins with listening. Many business owners know what they want to achieve, but putting those ideas into words — or visuals — isn't always easy. Through conversation, I take time to understand their goals and help shape those ideas into a clear direction.",
+      "From early concepts to final delivery, I guide each project step by step toward a thoughtful and polished result. My goal is simple: to create design work that feels authentic, professional, and something a business owner can take pride in sharing."
+    ],
+    quote: "Good design makes a vision tangible — turning ideas into something people can see, recognize, and connect with.",
+    headshot: "",
+    specialties: ["Brand Identity", "Editorial Design", "Print Production", "Apparel & Product Design"],
+    tools: ["Adobe Creative Suite", "Print Production", "Typography & Layout", "Color Theory"],
+    location: "Altamonte Springs, FL",
+    email: "Jalbanese79@gmail.com",
+    phone: "407.516.6193",
   },
-  {
-    name: "Editorial & Print Design",
-    price: "Starting at $2,000",
-    description: "Magazine layouts, brochures, catalogs, and print-ready production materials.",
-    includes: ["Layout System Design", "Typography Hierarchy", "Image Curation & Placement", "Print-Ready Files", "Up to 3 Revision Rounds"],
-    timeline: "2–4 weeks",
-  },
-  {
-    name: "Marketing & Collateral",
-    price: "Starting at $800",
-    description: "Flyers, social media assets, signage, menus, and promotional materials.",
-    includes: ["Custom Design Concepts", "Multiple Format Exports", "Social Media Templates", "Print & Digital Versions", "Source Files Included"],
-    timeline: "1–2 weeks",
-  },
-  {
-    name: "Apparel & Product Design",
-    price: "Starting at $1,200",
-    description: "Logo applications for merchandise, apparel mockups, and branded product design for print and production.",
-    includes: ["Apparel Mockups (Hats, Shirts, Bags)", "Logo Adaptation for Products", "Print-Ready Production Files", "Pattern & Repeat Design", "Textile-Ready Exports"],
-    timeline: "2–3 weeks",
-  },
-];
-
-const storePackages = [
-  {
-    name: "Logo Starter",
-    price: "$750",
-    description: "Perfect for new businesses needing a professional mark.",
-    includes: ["1 Logo Concept (3 rounds of revisions)", "Primary & Secondary Versions", "PNG, SVG, PDF Exports", "Basic Usage Guide"],
-    popular: false,
-  },
-  {
-    name: "Brand Essentials",
-    price: "$1,800",
-    description: "Everything you need to launch your brand with confidence.",
-    includes: ["Full Logo System", "Color Palette & Typography", "Brand Guidelines PDF", "Business Card Design", "Social Media Profile Kit"],
-    popular: true,
-  },
-  {
-    name: "Full Brand Suite",
-    price: "$3,500",
-    description: "A comprehensive identity package for serious businesses.",
-    includes: ["Everything in Brand Essentials", "Letterhead & Envelope", "Marketing Collateral Templates", "Signage & Environmental Design", "Brand Strategy Session"],
-    popular: false,
-  },
-];
-
-const blogPosts = [
-  {
-    id: 1,
-    title: "Why Your Brand Identity Is More Than Just a Logo",
-    excerpt: "A strong brand identity communicates who you are before a single word is spoken. Here's why investing in the full picture matters.",
-    date: "March 10, 2026",
-    category: "Branding",
-    readTime: "4 min read",
-  },
-  {
-    id: 2,
-    title: "The Art of Typography in Print Design",
-    excerpt: "Great typography doesn't just display text — it creates rhythm, hierarchy, and emotion. Lessons from editorial design.",
-    date: "March 3, 2026",
-    category: "Design",
-    readTime: "6 min read",
-  },
-  {
-    id: 3,
-    title: "Designing for Sensitive Industries: Lessons from Memorial Services",
-    excerpt: "Creating visual identities for sensitive contexts demands empathy, restraint, and intentional warmth.",
-    date: "February 24, 2026",
-    category: "Case Study",
-    readTime: "5 min read",
-  },
-];
+  services: [
+    { id: "brand-identity", name: "Brand Identity", price: "Starting at $1,500", description: "Complete visual identity including logo, color palette, typography, and brand guidelines.", includes: ["Logo Design & Variations", "Color Palette Development", "Typography Selection", "Brand Guidelines Document", "Business Card Design"], timeline: "2–3 weeks" },
+    { id: "editorial-print", name: "Editorial & Print Design", price: "Starting at $2,000", description: "Magazine layouts, brochures, catalogs, and print-ready production materials.", includes: ["Layout System Design", "Typography Hierarchy", "Image Curation & Placement", "Print-Ready Files", "Up to 3 Revision Rounds"], timeline: "2–4 weeks" },
+    { id: "marketing-collateral", name: "Marketing & Collateral", price: "Starting at $800", description: "Flyers, social media assets, signage, menus, and promotional materials.", includes: ["Custom Design Concepts", "Multiple Format Exports", "Social Media Templates", "Print & Digital Versions", "Source Files Included"], timeline: "1–2 weeks" },
+    { id: "apparel-product", name: "Apparel & Product Design", price: "Starting at $1,200", description: "Logo applications for merchandise, apparel mockups, and branded product design for print and production.", includes: ["Apparel Mockups (Hats, Shirts, Bags)", "Logo Adaptation for Products", "Print-Ready Production Files", "Pattern & Repeat Design", "Textile-Ready Exports"], timeline: "2–3 weeks" },
+  ],
+  store: [
+    { id: "logo-starter", name: "Logo Starter", price: "$750", description: "Perfect for new businesses needing a professional mark.", includes: ["1 Logo Concept (3 rounds of revisions)", "Primary & Secondary Versions", "PNG, SVG, PDF Exports", "Basic Usage Guide"], popular: false },
+    { id: "brand-essentials", name: "Brand Essentials", price: "$1,800", description: "Everything you need to launch your brand with confidence.", includes: ["Full Logo System", "Color Palette & Typography", "Brand Guidelines PDF", "Business Card Design", "Social Media Profile Kit"], popular: true },
+    { id: "full-brand-suite", name: "Full Brand Suite", price: "$3,500", description: "A comprehensive identity package for serious businesses.", includes: ["Everything in Brand Essentials", "Letterhead & Envelope", "Marketing Collateral Templates", "Signage & Environmental Design", "Brand Strategy Session"], popular: false },
+  ],
+};
 
 // ==================== RESPONSIVE CSS ====================
 const responsiveCSS = `
@@ -324,6 +248,7 @@ function ProjectCard({ project, large }) {
   const [hovered, setHovered] = useState(false);
   const bgColors = { "Brand Identity": COLORS.sage, "Editorial Design": COLORS.rust };
   const bg = bgColors[project.category] || COLORS.warmTan;
+  const hasCover = !!project.coverImage;
 
   return (
     <div
@@ -333,8 +258,11 @@ function ProjectCard({ project, large }) {
       <div style={{
         width: "100%", aspectRatio: large ? "16/10" : "4/3", backgroundColor: bg, borderRadius: 8,
         marginBottom: 16, position: "relative", overflow: "hidden",
+        backgroundImage: hasCover ? `url(${project.coverImage})` : undefined,
+        backgroundSize: "cover", backgroundPosition: "center",
         boxShadow: hovered ? "0 16px 48px rgba(0,0,0,0.12)" : "0 4px 16px rgba(0,0,0,0.04)",
       }}>
+        {hasCover && <div style={{ position: "absolute", inset: 0, backgroundColor: hovered ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.2)", transition: "background-color 0.3s" }} />}
         <div style={{
           position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
           color: "rgba(255,255,255,0.9)", fontFamily: "'Bebas Neue', sans-serif", fontSize: large ? 32 : 24,
@@ -347,7 +275,7 @@ function ProjectCard({ project, large }) {
         }} />
       </div>
       <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-        {project.tags.map((tag) => (
+        {(project.tags || []).map((tag) => (
           <span key={tag} style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.medGray }}>{tag}</span>
         ))}
       </div>
@@ -402,7 +330,9 @@ function HeroSection({ setPage }) {
   );
 }
 
-function FeaturedWork({ setPage }) {
+function FeaturedWork({ setPage, manifest }) {
+  const featured = (manifest.portfolio || []).filter(p => p.featured);
+  if (featured.length === 0) return null;
   return (
     <section className="section-padding" style={{ maxWidth: 1280, margin: "0 auto", paddingTop: 80 }}>
       <p style={sectionLabel}>Selected Work</p>
@@ -412,20 +342,20 @@ function FeaturedWork({ setPage }) {
           onClick={() => { setPage("Portfolio"); window.scrollTo(0, 0); }}>View All →</button>
       </div>
       <div className="projects-grid">
-        {portfolioProjects.map((p) => <ProjectCard key={p.id} project={p} />)}
+        {featured.map((p) => <ProjectCard key={p.id} project={p} />)}
       </div>
     </section>
   );
 }
 
-function ServicesPreview({ setPage }) {
+function ServicesPreview({ setPage, manifest }) {
   return (
     <section style={{ backgroundColor: COLORS.charcoal }} className="services-dark-padding">
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <p style={{ ...sectionLabel, color: COLORS.rustLight }}>What I Do</p>
         <h2 className="section-heading" style={{ color: COLORS.cream, marginBottom: 56 }}>SERVICES</h2>
         <div className="services-grid">
-          {services.map((s, i) => (
+          {(manifest.services || []).map((s, i) => (
             <div key={i} style={{ padding: "32px 24px", borderTop: `3px solid ${COLORS.rust}`, backgroundColor: "rgba(255,255,255,0.03)", borderRadius: "0 0 8px 8px" }}>
               <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: COLORS.cream, marginBottom: 8 }}>{s.name}</h3>
               <p style={{ fontSize: 14, color: COLORS.warmTan, lineHeight: 1.6, marginBottom: 16 }}>{s.description}</p>
@@ -460,14 +390,15 @@ function CTASection({ setPage }) {
 
 // ==================== PAGES ====================
 
-function HomePage({ setPage }) {
-  return (<><HeroSection setPage={setPage} /><FeaturedWork setPage={setPage} /><ServicesPreview setPage={setPage} /><CTASection setPage={setPage} /></>);
+function HomePage({ setPage, manifest }) {
+  return (<><HeroSection setPage={setPage} /><FeaturedWork setPage={setPage} manifest={manifest} /><ServicesPreview setPage={setPage} manifest={manifest} /><CTASection setPage={setPage} /></>);
 }
 
-function PortfolioPage() {
+function PortfolioPage({ manifest }) {
   const [activeFilter, setActiveFilter] = useState("All");
+  const allProjects = manifest.portfolio || [];
   const filters = ["All", "Brand Identity", "Editorial", "Print", "Apparel"];
-  const filtered = activeFilter === "All" ? portfolioProjects : portfolioProjects.filter((p) => p.tags.some((t) => t.includes(activeFilter)));
+  const filtered = activeFilter === "All" ? allProjects : allProjects.filter((p) => (p.tags || []).some((t) => t.includes(activeFilter)));
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
       <p style={sectionLabel}>Portfolio</p>
@@ -491,16 +422,21 @@ function PortfolioPage() {
   );
 }
 
-function AboutPage() {
+function AboutPage({ manifest }) {
+  const about = manifest.about || FALLBACK.about;
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
       <div className="about-grid">
         <div>
           <div style={{ width: "100%", aspectRatio: "3/4", backgroundColor: COLORS.warmTan, borderRadius: 8, overflow: "hidden", position: "relative", boxShadow: "0 16px 48px rgba(0,0,0,0.08)" }}>
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 5, backgroundColor: COLORS.rust }} />
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ fontSize: 18, fontFamily: "'DM Sans', sans-serif", color: COLORS.medGray }}>Photo</div>
-            </div>
+            {about.headshot ? (
+              <img src={about.headshot} alt="James Albanese" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ fontSize: 18, fontFamily: "'DM Sans', sans-serif", color: COLORS.medGray }}>Photo</div>
+              </div>
+            )}
           </div>
           <div style={{ textAlign: "center", marginTop: 24 }}>
             <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 300, color: COLORS.charcoal }}>James</div>
@@ -512,16 +448,16 @@ function AboutPage() {
           <h1 className="section-heading"><span style={{ color: COLORS.rust }}>GREAT</span> DESIGN<br />BEGINS WITH LISTENING</h1>
           <div style={accentLine} />
           <div style={{ maxWidth: 560 }}>
-            <p style={{ ...bodyText, marginBottom: 24 }}>I'm a freelance graphic designer who enjoys helping small businesses bring their ideas to life through clear, professional visuals that reflect who they are and what they offer.</p>
-            <p style={{ ...bodyText, marginBottom: 24 }}>I believe great design begins with listening. Many business owners know what they want to achieve, but putting those ideas into words — or visuals — isn't always easy. Through conversation, I take time to understand their goals and help shape those ideas into a clear direction.</p>
-            <p style={{ ...bodyText, marginBottom: 24 }}>From early concepts to final delivery, I guide each project step by step toward a thoughtful and polished result. My goal is simple: to create design work that feels authentic, professional, and something a business owner can take pride in sharing.</p>
-            <p style={{ ...bodyText, fontStyle: "italic", color: COLORS.charcoal }}>Good design makes a vision tangible — turning ideas into something people can see, recognize, and connect with.</p>
+            {(about.bio || []).map((paragraph, i) => (
+              <p key={i} style={{ ...bodyText, marginBottom: 24 }}>{paragraph}</p>
+            ))}
+            {about.quote && <p style={{ ...bodyText, fontStyle: "italic", color: COLORS.charcoal }}>{about.quote}</p>}
           </div>
           <div className="about-meta-grid" style={{ marginTop: 56, paddingTop: 48, borderTop: `1px solid ${COLORS.lightGray}` }}>
             {[
-              { label: "Specialties", items: ["Brand Identity", "Editorial Design", "Print Production", "Apparel & Product Design"] },
-              { label: "Tools", items: ["Adobe Creative Suite", "Print Production", "Typography & Layout", "Color Theory"] },
-              { label: "Based In", items: ["Altamonte Springs, FL", "Available Remotely", "Nationwide Clients"] },
+              { label: "Specialties", items: about.specialties || [] },
+              { label: "Tools", items: about.tools || [] },
+              { label: "Based In", items: [about.location || "Altamonte Springs, FL", "Available Remotely", "Nationwide Clients"] },
             ].map((col) => (
               <div key={col.label}>
                 <h4 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: "0.1em", marginBottom: 12, color: COLORS.charcoal }}>{col.label}</h4>
@@ -535,7 +471,8 @@ function AboutPage() {
   );
 }
 
-function ServicesPage({ setPage }) {
+function ServicesPage({ setPage, manifest }) {
+  const srvcs = manifest.services || FALLBACK.services;
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
       <p style={sectionLabel}>Services</p>
@@ -543,7 +480,7 @@ function ServicesPage({ setPage }) {
       <div style={accentLine} />
       <p style={{ ...bodyText, marginBottom: 64 }}>Every project is approached with the same commitment to quality, clarity, and thoughtful execution.</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
-        {services.map((s, i) => (
+        {srvcs.map((s, i) => (
           <div key={i} className="service-detail-grid" style={{ padding: "48px 24px", backgroundColor: i % 2 === 0 ? COLORS.offWhite : COLORS.cream, border: `1px solid ${COLORS.lightGray}`, borderRadius: 8 }}>
             <div>
               <h3 className="section-heading-md" style={{ marginBottom: 8 }}>{s.name.toUpperCase()}</h3>
@@ -575,7 +512,8 @@ function ServicesPage({ setPage }) {
   );
 }
 
-function StorePage() {
+function StorePage({ manifest }) {
+  const packages = manifest.store || FALLBACK.store;
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
       <p style={sectionLabel}>Store</p>
@@ -583,7 +521,7 @@ function StorePage() {
       <div style={accentLine} />
       <p style={{ ...bodyText, marginBottom: 64 }}>Ready-to-go design packages with clear deliverables and transparent pricing.</p>
       <div className="store-grid">
-        {storePackages.map((pkg, i) => (
+        {packages.map((pkg, i) => (
           <div key={i} style={{
             padding: "40px 32px", backgroundColor: pkg.popular ? COLORS.charcoal : COLORS.offWhite,
             color: pkg.popular ? COLORS.cream : COLORS.charcoal, borderRadius: 8,
@@ -622,15 +560,26 @@ function StorePage() {
   );
 }
 
-function BlogPage() {
+function BlogPage({ manifest }) {
+  const posts = manifest.blog || [];
+  if (posts.length === 0) {
+    return (
+      <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <p style={sectionLabel}>Blog</p>
+        <h1 className="section-heading">INSIGHTS & PROCESS</h1>
+        <div style={accentLine} />
+        <p style={{ textAlign: "center", color: COLORS.medGray, padding: "80px 0" }}>Blog posts coming soon. Check back later!</p>
+      </section>
+    );
+  }
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
       <p style={sectionLabel}>Blog</p>
       <h1 className="section-heading">INSIGHTS & PROCESS</h1>
       <div style={accentLine} />
       <div style={{ display: "flex", flexDirection: "column" }}>
-        {blogPosts.map((post, i) => (
-          <article key={post.id} className="blog-article" style={{ padding: "40px 0", borderBottom: i < blogPosts.length - 1 ? `1px solid ${COLORS.lightGray}` : "none", cursor: "pointer" }}>
+        {posts.map((post, i) => (
+          <article key={post.id} className="blog-article" style={{ padding: "40px 0", borderBottom: i < posts.length - 1 ? `1px solid ${COLORS.lightGray}` : "none", cursor: "pointer" }}>
             <div className="blog-thumb" style={{ width: 160, height: 120, backgroundColor: [COLORS.sage, COLORS.warmTan, COLORS.rust][i % 3], borderRadius: 6, opacity: 0.8 }} />
             <div>
               <div style={{ display: "flex", gap: 16, marginBottom: 8 }}>
@@ -649,7 +598,8 @@ function BlogPage() {
   );
 }
 
-function ContactPage() {
+function ContactPage({ manifest }) {
+  const about = manifest.about || FALLBACK.about;
   const [formData, setFormData] = useState({ name: "", email: "", project: "", message: "" });
   const inputStyle = { width: "100%", padding: "12px 16px", fontSize: 15, fontFamily: "'DM Sans', sans-serif", border: `1.5px solid ${COLORS.lightGray}`, borderRadius: 4, backgroundColor: COLORS.white, color: COLORS.charcoal, outline: "none", boxSizing: "border-box" };
   const labelStyle = { display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: COLORS.charcoal, marginBottom: 8 };
@@ -663,7 +613,7 @@ function ContactPage() {
           <div style={accentLine} />
           <p style={{ ...bodyText, marginBottom: 48 }}>Whether you have a clear vision or just a rough idea, I'd love to hear about your project. Reach out and let's talk about how we can bring it to life.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            {[{ label: "Email", value: "Jalbanese79@gmail.com" }, { label: "Phone", value: "407.516.6193" }, { label: "Location", value: "Altamonte Springs, FL" }].map((item) => (
+            {[{ label: "Email", value: about.email || "Jalbanese79@gmail.com" }, { label: "Phone", value: about.phone || "407.516.6193" }, { label: "Location", value: about.location || "Altamonte Springs, FL" }].map((item) => (
               <div key={item.label}>
                 <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 16, color: COLORS.charcoal }}>{item.value}</div>
@@ -697,7 +647,8 @@ function ContactPage() {
   );
 }
 
-function Footer({ setPage }) {
+function Footer({ setPage, manifest }) {
+  const about = manifest.about || FALLBACK.about;
   return (
     <footer className="footer-padding" style={{ backgroundColor: COLORS.charcoal, color: COLORS.warmTan }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
@@ -716,9 +667,9 @@ function Footer({ setPage }) {
           </div>
           <div>
             <h4 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: "0.15em", color: COLORS.cream, marginBottom: 16 }}>CONTACT</h4>
-            <p style={{ fontSize: 14, color: COLORS.warmTan, marginBottom: 8 }}>Jalbanese79@gmail.com</p>
-            <p style={{ fontSize: 14, color: COLORS.warmTan, marginBottom: 8 }}>407.516.6193</p>
-            <p style={{ fontSize: 14, color: COLORS.warmTan }}>Altamonte Springs, FL</p>
+            <p style={{ fontSize: 14, color: COLORS.warmTan, marginBottom: 8 }}>{about.email}</p>
+            <p style={{ fontSize: 14, color: COLORS.warmTan, marginBottom: 8 }}>{about.phone}</p>
+            <p style={{ fontSize: 14, color: COLORS.warmTan }}>{about.location}</p>
           </div>
         </div>
         <div className="footer-bottom" style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 24 }}>
@@ -735,6 +686,19 @@ function Footer({ setPage }) {
 export default function App() {
   const [currentPage, setPage] = useState("Home");
   const [isAdmin, setIsAdmin] = useState(window.location.hash === "#admin");
+  const [manifest, setManifest] = useState(FALLBACK);
+
+  // Fetch manifest from API on load
+  useEffect(() => {
+    fetch(`${API_BASE}/api/manifest`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && !data.error) setManifest(data);
+      })
+      .catch(() => {
+        // Silently fall back to defaults — site still works
+      });
+  }, []);
 
   useEffect(() => {
     const handleHash = () => setIsAdmin(window.location.hash === "#admin");
@@ -746,14 +710,14 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case "Home": return <HomePage setPage={setPage} />;
-      case "Portfolio": return <PortfolioPage />;
-      case "About": return <AboutPage />;
-      case "Services": return <ServicesPage setPage={setPage} />;
-      case "Store": return <StorePage />;
-      case "Blog": return <BlogPage />;
-      case "Contact": return <ContactPage />;
-      default: return <HomePage setPage={setPage} />;
+      case "Home": return <HomePage setPage={setPage} manifest={manifest} />;
+      case "Portfolio": return <PortfolioPage manifest={manifest} />;
+      case "About": return <AboutPage manifest={manifest} />;
+      case "Services": return <ServicesPage setPage={setPage} manifest={manifest} />;
+      case "Store": return <StorePage manifest={manifest} />;
+      case "Blog": return <BlogPage manifest={manifest} />;
+      case "Contact": return <ContactPage manifest={manifest} />;
+      default: return <HomePage setPage={setPage} manifest={manifest} />;
     }
   };
 
@@ -763,7 +727,7 @@ export default function App() {
       <style>{responsiveCSS}</style>
       <Navigation currentPage={currentPage} setPage={setPage} />
       {renderPage()}
-      <Footer setPage={setPage} />
+      <Footer setPage={setPage} manifest={manifest} />
     </div>
   );
 }
