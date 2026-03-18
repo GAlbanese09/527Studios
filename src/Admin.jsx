@@ -216,7 +216,7 @@ function PortfolioSection({ manifest, setManifest, token, saveManifest }) {
     const project = {
       id, title: "New Project", category: "Brand Identity",
       tags: ["Brand Identity"], description: "", images: [],
-      coverImage: "", order: manifest.portfolio.length,
+      coverImage: "", order: manifest.portfolio.length, featured: false,
     };
     setManifest({ ...manifest, portfolio: [...manifest.portfolio, project] });
     setEditing(id);
@@ -270,7 +270,10 @@ function PortfolioSection({ manifest, setManifest, token, saveManifest }) {
                 {!p.coverImage && p.title}
               </div>
               <div style={{ padding: "12px 16px" }}>
-                <div style={{ fontWeight: 600, fontSize: 14, color: C.white, marginBottom: 4 }}>{p.title}</div>
+                <div style={{ fontWeight: 600, fontSize: 14, color: C.white, marginBottom: 4 }}>
+                  {p.title}
+                  {p.featured && <span style={{ color: C.rust, fontSize: 10, marginLeft: 8 }}>⭐ FEATURED</span>}
+                </div>
                 <div style={{ fontSize: 11, color: C.medGray, textTransform: "uppercase", letterSpacing: "0.1em" }}>{p.category}</div>
                 <div style={{ fontSize: 11, color: C.medGray, marginTop: 4 }}>{p.images?.length || 0} images</div>
               </div>
@@ -288,6 +291,18 @@ function PortfolioSection({ manifest, setManifest, token, saveManifest }) {
             <AdminInput label="Tags (comma separated)" value={(project.tags || []).join(", ")}
               onChange={(v) => updateProject(editing, { tags: v.split(",").map((t) => t.trim()).filter(Boolean) })} />
             <AdminInput label="Description" value={project.description} onChange={(v) => updateProject(editing, { description: v })} multiline rows={4} />
+
+            <div style={{ marginTop: 8, marginBottom: 16 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", color: C.white, fontSize: 14 }}>
+                <input type="checkbox" checked={project.featured || false}
+                  onChange={(e) => updateProject(editing, { featured: e.target.checked })}
+                  style={{ width: 18, height: 18, accentColor: C.rust }} />
+                <span>⭐ Feature on Homepage</span>
+              </label>
+              <div style={{ fontSize: 11, color: C.medGray, marginTop: 4, marginLeft: 28 }}>
+                Featured projects appear in the "Featured Projects" section on the home page
+              </div>
+            </div>
 
             <div style={{ marginTop: 24, marginBottom: 16 }}>
               <label style={{ display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: C.medGray, marginBottom: 12 }}>Project Images</label>
