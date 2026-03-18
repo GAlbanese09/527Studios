@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import AdminPanel from "./Admin.jsx";
 
 const COLORS = {
   rust: "#C17A45",
@@ -733,6 +734,16 @@ function Footer({ setPage }) {
 
 export default function App() {
   const [currentPage, setPage] = useState("Home");
+  const [isAdmin, setIsAdmin] = useState(window.location.hash === "#admin");
+
+  useEffect(() => {
+    const handleHash = () => setIsAdmin(window.location.hash === "#admin");
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
+  }, []);
+
+  if (isAdmin) return <AdminPanel />;
+
   const renderPage = () => {
     switch (currentPage) {
       case "Home": return <HomePage setPage={setPage} />;
