@@ -136,6 +136,44 @@ function AdminButton({ children, onClick, variant = "primary", disabled, small, 
   );
 }
 
+function TagListInput({ label, values, onChange, placeholder, multiline, rows = 3 }) {
+  const [rawText, setRawText] = useState((values || []).join(", "));
+  const [focused, setFocused] = useState(false);
+
+  // Sync from parent when not focused (e.g. after save)
+  useEffect(() => {
+    if (!focused) setRawText((values || []).join(", "));
+  }, [values, focused]);
+
+  const handleBlur = (e) => {
+    e.target.style.borderColor = C.borderDark;
+    setFocused(false);
+    const parsed = rawText.split(",").map((s) => s.trim()).filter(Boolean);
+    onChange(parsed);
+  };
+
+  const style = {
+    width: "100%", padding: "10px 14px", fontSize: 14, backgroundColor: C.darkBg,
+    border: `1px solid ${C.borderDark}`, borderRadius: 4, color: C.white,
+    outline: "none", boxSizing: "border-box", fontFamily: "'DM Sans', sans-serif",
+    resize: multiline ? "vertical" : "none",
+  };
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      {label && <label style={{ display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: C.medGray, marginBottom: 6 }}>{label}</label>}
+      {multiline ? (
+        <textarea value={rawText} onChange={(e) => setRawText(e.target.value)} placeholder={placeholder} rows={rows} style={style}
+          onFocus={(e) => { e.target.style.borderColor = C.rust; setFocused(true); }} onBlur={handleBlur} />
+      ) : (
+        <input type="text" value={rawText} onChange={(e) => setRawText(e.target.value)} placeholder={placeholder} style={style}
+          onFocus={(e) => { e.target.style.borderColor = C.rust; setFocused(true); }} onBlur={handleBlur} />
+      )}
+      <div style={{ fontSize: 10, color: C.borderDark, marginTop: 4 }}>Separate with commas</div>
+    </div>
+  );
+}
+
 function ImageUploader({ token, folder, onUpload, label = "Upload Image" }) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState("");
@@ -288,8 +326,8 @@ function PortfolioSection({ manifest, setManifest, token, saveManifest }) {
           <div style={{ backgroundColor: C.cardBg, borderRadius: 8, padding: 24 }}>
             <AdminInput label="Project Title" value={project.title} onChange={(v) => updateProject(editing, { title: v })} />
             <AdminInput label="Category" value={project.category} onChange={(v) => updateProject(editing, { category: v })} placeholder="Brand Identity, Editorial Design, etc." />
-            <AdminInput label="Tags (comma separated)" value={(project.tags || []).join(", ")}
-              onChange={(v) => updateProject(editing, { tags: v.split(",").map((t) => t.trim()).filter(Boolean) })} />
+            <TagListInput label="Tags" values={project.tags || []}
+              onChange={(tags) => updateProject(editing, { tags })} placeholder="Brand Identity, Editorial, Apparel..." />
             <AdminInput label="Description" value={project.description} onChange={(v) => updateProject(editing, { description: v })} multiline rows={4} />
 
             <div style={{ marginTop: 8, marginBottom: 16 }}>
@@ -505,10 +543,10 @@ function AboutSection({ manifest, setManifest, token, saveManifest }) {
         </div>
 
         <div style={{ marginTop: 16 }}>
-          <AdminInput label="Specialties (comma separated)" value={(about.specialties || []).join(", ")}
-            onChange={(v) => update("specialties", v.split(",").map((s) => s.trim()).filter(Boolean))} />
-          <AdminInput label="Tools (comma separated)" value={(about.tools || []).join(", ")}
-            onChange={(v) => update("tools", v.split(",").map((s) => s.trim()).filter(Boolean))} />
+          <TagListInput label="Specialties" values={about.specialties || []}
+            onChange={(v) => update("specialties", v)} />
+          <TagListInput label="Tools" values={about.tools || []}
+            onChange={(v) => update("tools", v)} />
         </div>
 
         <div style={{ marginTop: 24 }}>
@@ -561,8 +599,8 @@ function ServicesSection({ manifest, setManifest, saveManifest }) {
             <AdminInput label="Price" value={service.price} onChange={(v) => updateService(editing, { price: v })} />
             <AdminInput label="Description" value={service.description} onChange={(v) => updateService(editing, { description: v })} multiline rows={3} />
             <AdminInput label="Timeline" value={service.timeline} onChange={(v) => updateService(editing, { timeline: v })} />
-            <AdminInput label="Includes (comma separated)" value={(service.includes || []).join(", ")}
-              onChange={(v) => updateService(editing, { includes: v.split(",").map((s) => s.trim()).filter(Boolean) })} multiline rows={3} />
+            <TagListInput label="Includes" values={service.includes || []}
+              onChange={(v) => updateService(editing, { includes: v })} multiline rows={3} />
             <div style={{ marginTop: 16 }}>
               <AdminButton onClick={() => { saveManifest(); setEditing(null); }} variant="success">Save Service</AdminButton>
             </div>
@@ -616,8 +654,8 @@ function StoreSection({ manifest, setManifest, saveManifest }) {
             <AdminInput label="Package Name" value={pkg.name} onChange={(v) => updatePackage(editing, { name: v })} />
             <AdminInput label="Price" value={pkg.price} onChange={(v) => updatePackage(editing, { price: v })} />
             <AdminInput label="Description" value={pkg.description} onChange={(v) => updatePackage(editing, { description: v })} multiline rows={2} />
-            <AdminInput label="Includes (comma separated)" value={(pkg.includes || []).join(", ")}
-              onChange={(v) => updatePackage(editing, { includes: v.split(",").map((s) => s.trim()).filter(Boolean) })} multiline rows={3} />
+            <TagListInput label="Includes" values={pkg.includes || []}
+              onChange={(v) => updatePackage(editing, { includes: v })} multiline rows={3} />
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", color: C.white, fontSize: 14 }}>
                 <input type="checkbox" checked={pkg.popular || false}
