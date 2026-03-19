@@ -667,7 +667,65 @@ function StorePage({ manifest }) {
   );
 }
 
-function BlogPage({ manifest }) {
+function BlogDetailPage({ post, manifest, onBack, onNavigate }) {
+  const posts = manifest.blog || [];
+  const currentIdx = posts.findIndex((p) => p.id === post.id);
+  const prevPost = currentIdx > 0 ? posts[currentIdx - 1] : null;
+  const nextPost = currentIdx < posts.length - 1 ? posts[currentIdx + 1] : null;
+
+  return (
+    <section className="section-padding section-padding-top" style={{ maxWidth: 800, margin: "0 auto" }}>
+      <button
+        onClick={onBack}
+        style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: COLORS.rust, marginBottom: 32, padding: 0 }}
+      >
+        ← Back to Blog
+      </button>
+
+      {post.image && (
+        <div style={{ width: "100%", borderRadius: 8, overflow: "hidden", marginBottom: 40 }}>
+          <img src={encodeURI(post.image)} alt={post.title} style={{ width: "100%", height: "auto", display: "block" }} />
+        </div>
+      )}
+
+      <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
+        <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: COLORS.rust }}>{post.category}</span>
+        <span style={{ fontSize: 12, color: COLORS.medGray }}>{post.readTime}</span>
+      </div>
+
+      <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 48, lineHeight: 1.0, letterSpacing: "0.02em", color: COLORS.charcoal, marginBottom: 12 }}>{post.title}</h1>
+      <p style={{ fontSize: 14, color: COLORS.medGray, marginBottom: 24 }}>{post.date}</p>
+      <div style={accentLine} />
+
+      <div style={{ marginBottom: 64 }}>
+        {(post.content || post.excerpt || "").split("\n").filter(Boolean).map((para, i) => (
+          <p key={i} style={{ ...bodyText, marginBottom: 24, maxWidth: "none" }}>{para}</p>
+        ))}
+      </div>
+
+      <div className="project-nav" style={{ borderTop: `1px solid ${COLORS.lightGray}`, paddingTop: 32 }}>
+        <div>
+          {prevPost && (
+            <button onClick={() => onNavigate(prevPost)} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textAlign: "left", padding: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 4 }}>← Previous</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: COLORS.charcoal }}>{prevPost.title}</div>
+            </button>
+          )}
+        </div>
+        <div>
+          {nextPost && (
+            <button onClick={() => onNavigate(nextPost)} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textAlign: "right", padding: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 4 }}>Next →</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: COLORS.charcoal }}>{nextPost.title}</div>
+            </button>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BlogPage({ manifest, onPostClick }) {
   const posts = manifest.blog || [];
   if (posts.length === 0) {
     return (
@@ -686,8 +744,14 @@ function BlogPage({ manifest }) {
       <div style={accentLine} />
       <div style={{ display: "flex", flexDirection: "column" }}>
         {posts.map((post, i) => (
-          <article key={post.id} className="blog-article" style={{ padding: "40px 0", borderBottom: i < posts.length - 1 ? `1px solid ${COLORS.lightGray}` : "none", cursor: "pointer" }}>
-            <div className="blog-thumb" style={{ width: 160, height: 120, backgroundColor: [COLORS.sage, COLORS.warmTan, COLORS.rust][i % 3], borderRadius: 6, opacity: 0.8 }} />
+          <article key={post.id} className="blog-article" style={{ padding: "40px 0", borderBottom: i < posts.length - 1 ? `1px solid ${COLORS.lightGray}` : "none", cursor: "pointer" }}
+            onClick={() => onPostClick && onPostClick(post)}>
+            <div className="blog-thumb" style={{
+              width: 160, height: 120, borderRadius: 6, opacity: 0.8,
+              backgroundColor: post.image ? undefined : [COLORS.sage, COLORS.warmTan, COLORS.rust][i % 3],
+              backgroundImage: post.image ? `url(${encodeURI(post.image)})` : undefined,
+              backgroundSize: "cover", backgroundPosition: "center",
+            }} />
             <div>
               <div style={{ display: "flex", gap: 16, marginBottom: 8 }}>
                 <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: COLORS.rust }}>{post.category}</span>
@@ -793,11 +857,13 @@ function Footer({ setPage, manifest }) {
 export default function App() {
   const [currentPage, setPage] = useState("Home");
   const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedPost, setSelectedPost] = useState(null);
   const [isAdmin, setIsAdmin] = useState(window.location.hash === "#admin");
   const [manifest, setManifest] = useState(FALLBACK);
 
   const navigateTo = (page) => {
     setSelectedProject(null);
+    setSelectedPost(null);
     setPage(page);
     window.scrollTo(0, 0);
   };
@@ -832,13 +898,16 @@ export default function App() {
     if (selectedProject) {
       return <ProjectDetailPage project={selectedProject} manifest={manifest} onBack={() => { setSelectedProject(null); setPage("Portfolio"); }} onNavigate={setSelectedProject} />;
     }
+    if (selectedPost) {
+      return <BlogDetailPage post={selectedPost} manifest={manifest} onBack={() => { setSelectedPost(null); }} onNavigate={(post) => { setSelectedPost(post); window.scrollTo(0, 0); }} />;
+    }
     switch (currentPage) {
       case "Home": return <HomePage setPage={navigateTo} manifest={manifest} onProjectClick={handleProjectClick} />;
       case "Portfolio": return <PortfolioPage manifest={manifest} onProjectClick={handleProjectClick} />;
       case "About": return <AboutPage manifest={manifest} />;
       case "Services": return <ServicesPage setPage={navigateTo} manifest={manifest} />;
       case "Store": return <StorePage manifest={manifest} />;
-      case "Blog": return <BlogPage manifest={manifest} />;
+      case "Blog": return <BlogPage manifest={manifest} onPostClick={(post) => { setSelectedPost(post); window.scrollTo(0, 0); }} />;
       case "Contact": return <ContactPage manifest={manifest} />;
       default: return <HomePage setPage={navigateTo} manifest={manifest} onProjectClick={handleProjectClick} />;
     }
