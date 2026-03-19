@@ -184,7 +184,8 @@ function ImageUploader({ token, folder, onUpload, label = "Upload Image" }) {
     for (const file of files) {
       setProgress(`Uploading ${file.name}...`);
       try {
-        const key = folder ? `${folder}/${file.name}` : file.name;
+        const safeName = file.name.replace(/\s+/g, '-');
+        const key = folder ? `${folder}/${safeName}` : safeName;
         const publicUrl = `https://images.527studios.com/${key}`;
 
         // Upload directly through Worker (bypasses S3 CORS entirely)

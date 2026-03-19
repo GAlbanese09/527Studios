@@ -258,7 +258,7 @@ function ProjectCard({ project, large }) {
       <div style={{
         width: "100%", aspectRatio: large ? "16/10" : "4/3", backgroundColor: bg, borderRadius: 8,
         marginBottom: 16, position: "relative", overflow: "hidden",
-        backgroundImage: hasCover ? `url(${project.coverImage})` : undefined,
+        backgroundImage: hasCover ? `url(${encodeURI(project.coverImage)})` : undefined,
         backgroundSize: "cover", backgroundPosition: "center",
         boxShadow: hovered ? "0 16px 48px rgba(0,0,0,0.12)" : "0 4px 16px rgba(0,0,0,0.04)",
       }}>
