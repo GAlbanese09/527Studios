@@ -674,7 +674,7 @@ function BlogDetailPage({ post, manifest, onBack, onNavigate }) {
   const nextPost = currentIdx < posts.length - 1 ? posts[currentIdx + 1] : null;
 
   return (
-    <section className="section-padding section-padding-top" style={{ maxWidth: 800, margin: "0 auto" }}>
+    <section className="section-padding" style={{ maxWidth: 800, margin: "0 auto", paddingTop: 140 }}>
       <button
         onClick={onBack}
         style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: COLORS.rust, marginBottom: 32, padding: 0 }}
@@ -683,8 +683,8 @@ function BlogDetailPage({ post, manifest, onBack, onNavigate }) {
       </button>
 
       {post.image && (
-        <div style={{ width: "100%", borderRadius: 8, overflow: "hidden", marginBottom: 40 }}>
-          <img src={encodeURI(post.image)} alt={post.title} style={{ width: "100%", height: "auto", display: "block" }} />
+        <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 48, backgroundColor: "#f0ece4" }}>
+          <img src={encodeURI(post.image)} alt={post.title} style={{ width: "100%", maxHeight: "50vh", objectFit: "cover", display: "block" }} />
         </div>
       )}
 
