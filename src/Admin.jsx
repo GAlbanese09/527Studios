@@ -184,24 +184,29 @@ function ImageUploader({ token, folder, onUpload, label = "Upload Image" }) {
     for (const file of files) {
       setProgress(`Uploading ${file.name}...`);
       try {
-        // Get presigned URL
-        const res = await fetch(`${API_BASE}/api/upload/presign`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ folder, filename: file.name, contentType: file.type }),
-        });
-        const { uploadUrl, key, publicUrl } = await res.json();
+        const key = folder ? `${folder}/${file.name}` : file.name;
+        const publicUrl = `https://images.527studios.com/${key}`;
 
-        // Upload directly to R2
-        await fetch(uploadUrl, {
+        // Upload directly through Worker (bypasses S3 CORS entirely)
+        const res = await fetch(`${API_BASE}/api/upload?key=${encodeURIComponent(key)}`, {
           method: "PUT",
-          headers: { "Content-Type": file.type },
+          headers: {
+            "Content-Type": file.type,
+            Authorization: `Bearer ${token}`,
+          },
           body: file,
         });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || "Upload failed");
+        }
 
         onUpload({ key, publicUrl, filename: file.name });
       } catch (err) {
         console.error("Upload failed:", err);
+        setProgress(`Failed: ${err.message}`);
+        await new Promise(r => setTimeout(r, 2000));
       }
     }
     setProgress("");
