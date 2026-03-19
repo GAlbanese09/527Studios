@@ -261,6 +261,7 @@ function PortfolioSection({ manifest, setManifest, token, saveManifest }) {
       id, title: "New Project", category: "Brand Identity",
       tags: ["Brand Identity"], description: "", images: [],
       coverImage: "", order: manifest.portfolio.length, featured: false,
+      displaySize: "standard",
     };
     setManifest({ ...manifest, portfolio: [...manifest.portfolio, project] });
     setEditing(id);
@@ -345,6 +346,29 @@ function PortfolioSection({ manifest, setManifest, token, saveManifest }) {
               </label>
               <div style={{ fontSize: 11, color: C.medGray, marginTop: 4, marginLeft: 28 }}>
                 Featured projects appear in the "Featured Projects" section on the home page
+              </div>
+            </div>
+
+            <div style={{ marginTop: 8, marginBottom: 16 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: C.medGray, marginBottom: 8 }}>Grid Display Size</label>
+              <div style={{ display: "flex", gap: 8 }}>
+                {["standard", "wide", "featured"].map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => updateProject(editing, { displaySize: size })}
+                    style={{
+                      padding: "8px 16px", fontSize: 12, fontWeight: 600,
+                      textTransform: "uppercase", letterSpacing: "0.08em",
+                      borderRadius: 4, cursor: "pointer", fontFamily: "'DM Sans'",
+                      backgroundColor: (project.displaySize || "standard") === size ? C.rust : "transparent",
+                      color: (project.displaySize || "standard") === size ? C.white : C.medGray,
+                      border: `1px solid ${(project.displaySize || "standard") === size ? C.rust : C.borderDark}`,
+                    }}
+                  >{size}</button>
+                ))}
+              </div>
+              <div style={{ fontSize: 10, color: C.borderDark, marginTop: 4 }}>
+                Standard = 1 column, Wide = 2 columns landscape, Featured = 2 columns large
               </div>
             </div>
 

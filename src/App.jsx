@@ -73,6 +73,22 @@ const responsiveCSS = `
 
   .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
   .projects-grid-2col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; }
+
+  /* Bento grid for portfolio */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    grid-auto-flow: dense;
+  }
+  .bento-grid .bento-wide { grid-column: span 2; }
+  .bento-grid .bento-featured { grid-column: span 2; }
+  .bento-grid .bento-featured .bento-image { aspect-ratio: 16/9; }
+  .bento-grid .bento-standard .bento-image { aspect-ratio: 4/3; }
+  .bento-grid .bento-wide .bento-image { aspect-ratio: 21/9; }
+
+  /* Project detail responsive */
+  .project-nav { display: flex; justify-content: space-between; align-items: center; }
   .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
   .store-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
   .service-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
@@ -102,6 +118,7 @@ const responsiveCSS = `
     .hero-right { display: none; }
     .hero-bg-shape { display: none; }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .bento-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 768px) {
@@ -123,6 +140,9 @@ const responsiveCSS = `
     .section-heading-md { font-size: 30px; }
     .projects-grid { grid-template-columns: 1fr; }
     .projects-grid-2col { grid-template-columns: 1fr; }
+    .bento-grid { grid-template-columns: 1fr; }
+    .bento-grid .bento-wide, .bento-grid .bento-featured { grid-column: span 1; }
+    .project-nav { flex-direction: column; gap: 16px; }
     .services-grid { grid-template-columns: 1fr; }
     .store-grid { grid-template-columns: 1fr; }
     .service-detail-grid { grid-template-columns: 1fr; }
@@ -244,19 +264,24 @@ function Navigation({ currentPage, setPage }) {
   );
 }
 
-function ProjectCard({ project, large }) {
+function ProjectCard({ project, onClick }) {
   const [hovered, setHovered] = useState(false);
   const bgColors = { "Brand Identity": COLORS.sage, "Editorial Design": COLORS.rust };
   const bg = bgColors[project.category] || COLORS.warmTan;
   const hasCover = !!project.coverImage;
+  const size = project.displaySize || "standard";
+  const sizeClass = `bento-${size}`;
+  const titleSize = size === "featured" ? 32 : size === "wide" ? 28 : 24;
 
   return (
     <div
+      className={sizeClass}
       style={{ cursor: "pointer", transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)", transform: hovered ? "translateY(-4px)" : "translateY(0)" }}
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+      onClick={() => onClick && onClick(project)}
     >
-      <div style={{
-        width: "100%", aspectRatio: large ? "16/10" : "4/3", backgroundColor: bg, borderRadius: 8,
+      <div className="bento-image" style={{
+        width: "100%", backgroundColor: bg, borderRadius: 8,
         marginBottom: 16, position: "relative", overflow: "hidden",
         backgroundImage: hasCover ? `url(${encodeURI(project.coverImage)})` : undefined,
         backgroundSize: "cover", backgroundPosition: "center",
@@ -265,7 +290,7 @@ function ProjectCard({ project, large }) {
         {hasCover && <div style={{ position: "absolute", inset: 0, backgroundColor: hovered ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.2)", transition: "background-color 0.3s" }} />}
         <div style={{
           position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
-          color: "rgba(255,255,255,0.9)", fontFamily: "'Bebas Neue', sans-serif", fontSize: large ? 32 : 24,
+          color: "rgba(255,255,255,0.9)", fontFamily: "'Bebas Neue', sans-serif", fontSize: titleSize,
           letterSpacing: "0.05em", textAlign: "center", padding: 24,
         }}>{project.title}</div>
         <div style={{
@@ -280,8 +305,90 @@ function ProjectCard({ project, large }) {
         ))}
       </div>
       <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 18, marginBottom: 6 }}>{project.title}</h3>
-      <p style={{ fontSize: 14, color: COLORS.medGray, lineHeight: 1.5 }}>{project.description}</p>
     </div>
+  );
+}
+
+function ProjectDetailPage({ project, manifest, onBack, onNavigate }) {
+  const portfolio = manifest.portfolio || [];
+  const currentIdx = portfolio.findIndex((p) => p.id === project.id);
+  const prevProject = currentIdx > 0 ? portfolio[currentIdx - 1] : null;
+  const nextProject = currentIdx < portfolio.length - 1 ? portfolio[currentIdx + 1] : null;
+
+  const handleNavigate = (proj) => {
+    onNavigate(proj);
+    window.scrollTo(0, 0);
+  };
+
+  return (
+    <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
+      <button
+        onClick={onBack}
+        style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: COLORS.rust, marginBottom: 32, padding: 0 }}
+      >
+        ← Back to Portfolio
+      </button>
+
+      {/* Hero image */}
+      <div style={{ width: "100%", backgroundColor: "#f0ece4", borderRadius: 8, overflow: "hidden", marginBottom: 48 }}>
+        <img
+          src={encodeURI(project.coverImage || "")}
+          alt={project.title}
+          style={{ width: "100%", maxHeight: "70vh", objectFit: "contain", display: "block", margin: "0 auto" }}
+        />
+      </div>
+
+      {/* Metadata */}
+      <div style={{ marginBottom: 48 }}>
+        <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+          {(project.tags || []).map((tag) => (
+            <span key={tag} style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: COLORS.rust }}>{tag}</span>
+          ))}
+        </div>
+        <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 56, lineHeight: 1.0, letterSpacing: "0.02em", color: COLORS.charcoal, marginBottom: 16 }}>{project.title}</h1>
+        <div style={accentLine} />
+        {project.category && <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 16 }}>{project.category}</p>}
+        {project.description && <p style={{ ...bodyText }}>{project.description}</p>}
+      </div>
+
+      {/* Image gallery */}
+      {(project.images || []).length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 32, marginBottom: 64 }}>
+          {project.images.map((img, idx) => (
+            <div key={idx} style={{ borderRadius: 8, overflow: "hidden", backgroundColor: "#f0ece4" }}>
+              <img
+                src={encodeURI(img.url || "")}
+                alt={img.title || ""}
+                style={{ width: "100%", height: "auto", display: "block" }}
+              />
+              {img.title && (
+                <div style={{ padding: "12px 16px", fontSize: 14, color: COLORS.medGray }}>{img.title}</div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Next/Previous navigation */}
+      <div className="project-nav" style={{ borderTop: `1px solid ${COLORS.lightGray}`, paddingTop: 32 }}>
+        <div>
+          {prevProject && (
+            <button onClick={() => handleNavigate(prevProject)} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textAlign: "left", padding: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 4 }}>← Previous</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: COLORS.charcoal }}>{prevProject.title}</div>
+            </button>
+          )}
+        </div>
+        <div>
+          {nextProject && (
+            <button onClick={() => handleNavigate(nextProject)} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textAlign: "right", padding: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 4 }}>Next →</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: COLORS.charcoal }}>{nextProject.title}</div>
+            </button>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -330,7 +437,7 @@ function HeroSection({ setPage }) {
   );
 }
 
-function FeaturedWork({ setPage, manifest }) {
+function FeaturedWork({ setPage, manifest, onProjectClick }) {
   const featured = (manifest.portfolio || []).filter(p => p.featured);
   if (featured.length === 0) return null;
   return (
@@ -341,8 +448,8 @@ function FeaturedWork({ setPage, manifest }) {
         <button style={{ ...btnBase, color: COLORS.rust, padding: 0, border: "none", background: "none" }}
           onClick={() => { setPage("Portfolio"); window.scrollTo(0, 0); }}>View All →</button>
       </div>
-      <div className="projects-grid">
-        {featured.map((p) => <ProjectCard key={p.id} project={p} />)}
+      <div className="bento-grid">
+        {featured.map((p) => <ProjectCard key={p.id} project={p} onClick={onProjectClick} />)}
       </div>
     </section>
   );
@@ -390,11 +497,11 @@ function CTASection({ setPage }) {
 
 // ==================== PAGES ====================
 
-function HomePage({ setPage, manifest }) {
-  return (<><HeroSection setPage={setPage} /><FeaturedWork setPage={setPage} manifest={manifest} /><ServicesPreview setPage={setPage} manifest={manifest} /><CTASection setPage={setPage} /></>);
+function HomePage({ setPage, manifest, onProjectClick }) {
+  return (<><HeroSection setPage={setPage} /><FeaturedWork setPage={setPage} manifest={manifest} onProjectClick={onProjectClick} /><ServicesPreview setPage={setPage} manifest={manifest} /><CTASection setPage={setPage} /></>);
 }
 
-function PortfolioPage({ manifest }) {
+function PortfolioPage({ manifest, onProjectClick }) {
   const [activeFilter, setActiveFilter] = useState("All");
   const allProjects = manifest.portfolio || [];
   const filters = ["All", "Brand Identity", "Editorial", "Print", "Apparel"];
@@ -414,8 +521,8 @@ function PortfolioPage({ manifest }) {
           }}>{f}</button>
         ))}
       </div>
-      <div className="projects-grid-2col">
-        {filtered.map((p) => <ProjectCard key={p.id} project={p} large />)}
+      <div className="bento-grid">
+        {filtered.map((p) => <ProjectCard key={p.id} project={p} onClick={onProjectClick} />)}
       </div>
       {filtered.length === 0 && <p style={{ textAlign: "center", color: COLORS.medGray, padding: "80px 0" }}>More projects in this category coming soon.</p>}
     </section>
@@ -685,8 +792,21 @@ function Footer({ setPage, manifest }) {
 
 export default function App() {
   const [currentPage, setPage] = useState("Home");
+  const [selectedProject, setSelectedProject] = useState(null);
   const [isAdmin, setIsAdmin] = useState(window.location.hash === "#admin");
   const [manifest, setManifest] = useState(FALLBACK);
+
+  const navigateTo = (page) => {
+    setSelectedProject(null);
+    setPage(page);
+    window.scrollTo(0, 0);
+  };
+
+  const handleProjectClick = (project) => {
+    setSelectedProject(project);
+    setPage("Portfolio");
+    window.scrollTo(0, 0);
+  };
 
   // Fetch manifest from API on load
   useEffect(() => {
@@ -709,15 +829,18 @@ export default function App() {
   if (isAdmin) return <AdminPanel />;
 
   const renderPage = () => {
+    if (selectedProject) {
+      return <ProjectDetailPage project={selectedProject} manifest={manifest} onBack={() => { setSelectedProject(null); setPage("Portfolio"); }} onNavigate={setSelectedProject} />;
+    }
     switch (currentPage) {
-      case "Home": return <HomePage setPage={setPage} manifest={manifest} />;
-      case "Portfolio": return <PortfolioPage manifest={manifest} />;
+      case "Home": return <HomePage setPage={navigateTo} manifest={manifest} onProjectClick={handleProjectClick} />;
+      case "Portfolio": return <PortfolioPage manifest={manifest} onProjectClick={handleProjectClick} />;
       case "About": return <AboutPage manifest={manifest} />;
-      case "Services": return <ServicesPage setPage={setPage} manifest={manifest} />;
+      case "Services": return <ServicesPage setPage={navigateTo} manifest={manifest} />;
       case "Store": return <StorePage manifest={manifest} />;
       case "Blog": return <BlogPage manifest={manifest} />;
       case "Contact": return <ContactPage manifest={manifest} />;
-      default: return <HomePage setPage={setPage} manifest={manifest} />;
+      default: return <HomePage setPage={navigateTo} manifest={manifest} onProjectClick={handleProjectClick} />;
     }
   };
 
@@ -725,9 +848,9 @@ export default function App() {
     <div style={{ fontFamily: "'DM Sans', sans-serif", color: COLORS.charcoal, backgroundColor: COLORS.cream, lineHeight: 1.6, WebkitFontSmoothing: "antialiased", overflowX: "hidden", width: "100%" }}>
       <style>{FONTS}</style>
       <style>{responsiveCSS}</style>
-      <Navigation currentPage={currentPage} setPage={setPage} />
+      <Navigation currentPage={currentPage} setPage={navigateTo} />
       {renderPage()}
-      <Footer setPage={setPage} manifest={manifest} />
+      <Footer setPage={navigateTo} manifest={manifest} />
     </div>
   );
 }
