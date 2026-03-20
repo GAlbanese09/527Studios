@@ -332,7 +332,6 @@ function PortfolioSection({ manifest, setManifest, token, saveManifest }) {
           </button>
           <div style={{ backgroundColor: C.cardBg, borderRadius: 8, padding: 24 }}>
             <AdminInput label="Project Title" value={project.title} onChange={(v) => updateProject(editing, { title: v })} />
-            <AdminInput label="Category" value={project.category} onChange={(v) => updateProject(editing, { category: v })} placeholder="Brand Identity, Editorial Design, etc." />
             {/* Tag Selection */}
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: C.medGray, marginBottom: 8 }}>TAGS</label>

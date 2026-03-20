@@ -268,8 +268,8 @@ function Navigation({ currentPage, setPage }) {
 
 function ProjectCard({ project, onClick }) {
   const [hovered, setHovered] = useState(false);
-  const bgColors = { "Brand Identity": COLORS.sage, "Editorial Design": COLORS.rust };
-  const bg = bgColors[project.category] || COLORS.warmTan;
+  const firstTag = (project.tags || [])[0] || "";
+  const bg = firstTag.includes("Brand") ? COLORS.sage : firstTag.includes("Editorial") ? COLORS.rust : COLORS.warmTan;
   const hasCover = !!project.coverImage;
   const size = project.displaySize || "standard";
   const sizeClass = `bento-${size}`;
@@ -349,7 +349,6 @@ function ProjectDetailPage({ project, manifest, onBack, onNavigate }) {
         </div>
         <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 56, lineHeight: 1.0, letterSpacing: "0.02em", color: COLORS.charcoal, marginBottom: 16 }}>{project.title}</h1>
         <div style={accentLine} />
-        {project.category && <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 16 }}>{project.category}</p>}
         {project.description && <p style={{ ...bodyText }}>{project.description}</p>}
       </div>
 
