@@ -362,7 +362,23 @@ function PortfolioSection({ manifest, setManifest, token, saveManifest }) {
                               border: `1px solid ${isSelected ? C.rust : C.borderDark}`,
                               transition: "all 0.2s ease",
                             }}
-                          >{tag}</button>
+                          >
+                            {tag}
+                            {!defaultTags.includes(tag) && (
+                              <span
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const updatedPortfolio = manifest.portfolio.map(p => ({
+                                    ...p,
+                                    tags: (p.tags || []).filter(t => t !== tag)
+                                  }));
+                                  const updatedCustomTags = (manifest.customTags || []).filter(t => t !== tag);
+                                  setManifest(prev => ({ ...prev, portfolio: updatedPortfolio, customTags: updatedCustomTags }));
+                                }}
+                                style={{ marginLeft: 6, fontSize: 14, fontWeight: 700, cursor: "pointer" }}
+                              >×</span>
+                            )}
+                          </button>
                         );
                       })}
                     </div>
