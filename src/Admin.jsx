@@ -333,8 +333,73 @@ function PortfolioSection({ manifest, setManifest, token, saveManifest }) {
           <div style={{ backgroundColor: C.cardBg, borderRadius: 8, padding: 24 }}>
             <AdminInput label="Project Title" value={project.title} onChange={(v) => updateProject(editing, { title: v })} />
             <AdminInput label="Category" value={project.category} onChange={(v) => updateProject(editing, { category: v })} placeholder="Brand Identity, Editorial Design, etc." />
-            <TagListInput label="Tags" values={project.tags || []}
-              onChange={(tags) => updateProject(editing, { tags })} placeholder="Brand Identity, Editorial, Apparel..." />
+            {/* Tag Selection */}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: C.medGray, marginBottom: 8 }}>TAGS</label>
+              {(() => {
+                const defaultTags = ["Brand Identity", "Editorial Design", "Print Design", "Marketing & Collateral", "Apparel & Product"];
+                const customTags = manifest.customTags || [];
+                const allAvailableTags = [...new Set([...defaultTags, ...customTags])];
+                const projectTags = project.tags || [];
+                return (
+                  <>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                      {allAvailableTags.map(tag => {
+                        const isSelected = projectTags.includes(tag);
+                        return (
+                          <button
+                            key={tag}
+                            onClick={() => {
+                              const newTags = isSelected
+                                ? projectTags.filter(t => t !== tag)
+                                : [...projectTags, tag];
+                              updateProject(editing, { tags: newTags });
+                            }}
+                            style={{
+                              padding: "6px 14px", fontSize: 12, fontWeight: 600,
+                              borderRadius: 4, cursor: "pointer", fontFamily: "'DM Sans'",
+                              backgroundColor: isSelected ? C.rust : "transparent",
+                              color: isSelected ? C.white : C.medGray,
+                              border: `1px solid ${isSelected ? C.rust : C.borderDark}`,
+                              transition: "all 0.2s ease",
+                            }}
+                          >{tag}</button>
+                        );
+                      })}
+                    </div>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <input
+                        type="text"
+                        placeholder="Add custom tag..."
+                        style={{
+                          flex: 1, padding: "8px 12px", fontSize: 13,
+                          backgroundColor: C.darkBg, color: C.white,
+                          border: `1px solid ${C.borderDark}`, borderRadius: 4,
+                          fontFamily: "'DM Sans'", outline: "none", boxSizing: "border-box",
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && e.target.value.trim()) {
+                            const newTag = e.target.value.trim();
+                            const existing = manifest.customTags || [];
+                            if (!existing.includes(newTag) && !["Brand Identity", "Editorial Design", "Print Design", "Marketing & Collateral", "Apparel & Product"].includes(newTag)) {
+                              setManifest(prev => ({ ...prev, customTags: [...existing, newTag] }));
+                            }
+                            const currentTags = project.tags || [];
+                            if (!currentTags.includes(newTag)) {
+                              updateProject(editing, { tags: [...currentTags, newTag] });
+                            }
+                            e.target.value = "";
+                          }
+                        }}
+                      />
+                    </div>
+                    <div style={{ fontSize: 10, color: C.borderDark, marginTop: 4 }}>
+                      Click tags to select/deselect. Type a new tag and press Enter to add it.
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
             <AdminInput label="Description" value={project.description} onChange={(v) => updateProject(editing, { description: v })} multiline rows={4} />
 
             <div style={{ marginTop: 8, marginBottom: 16 }}>
@@ -701,6 +766,91 @@ function StoreSection({ manifest, setManifest, saveManifest }) {
   );
 }
 
+// ==================== SECTION: FAQ ====================
+
+function FAQSection({ manifest, setManifest, saveManifest }) {
+  const [editing, setEditing] = useState(null);
+  const faqs = manifest.faq || [];
+
+  const addFaq = () => {
+    const id = `faq-${Date.now()}`;
+    const faq = { id, question: "New Question", answer: "" };
+    setManifest({ ...manifest, faq: [...faqs, faq] });
+    setEditing(id);
+  };
+
+  const updateFaq = (id, updates) => {
+    setManifest({
+      ...manifest,
+      faq: faqs.map((f) => (f.id === id ? { ...f, ...updates } : f)),
+    });
+  };
+
+  const deleteFaq = (id) => {
+    if (!confirm("Delete this FAQ?")) return;
+    setManifest({ ...manifest, faq: faqs.filter((f) => f.id !== id) });
+    if (editing === id) setEditing(null);
+  };
+
+  const moveFaq = (idx, direction) => {
+    const newFaqs = [...faqs];
+    const targetIdx = idx + direction;
+    if (targetIdx < 0 || targetIdx >= newFaqs.length) return;
+    [newFaqs[idx], newFaqs[targetIdx]] = [newFaqs[targetIdx], newFaqs[idx]];
+    setManifest({ ...manifest, faq: newFaqs });
+  };
+
+  const faq = editing ? faqs.find((f) => f.id === editing) : null;
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+        <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, color: C.white }}>FAQ</h2>
+        <AdminButton onClick={addFaq}>+ New FAQ</AdminButton>
+      </div>
+
+      {!editing ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {faqs.map((f, idx) => (
+            <div key={f.id} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              backgroundColor: C.cardBg, padding: "16px 20px", borderRadius: 6, cursor: "pointer",
+            }} onClick={() => setEditing(f.id)}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: 15, color: C.white }}>{f.question}</div>
+                <div style={{ fontSize: 12, color: C.medGray, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.answer}</div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, marginLeft: 12, flexShrink: 0 }}>
+                <button onClick={(e) => { e.stopPropagation(); moveFaq(idx, -1); }}
+                  style={{ background: "none", border: "none", color: idx === 0 ? C.borderDark : C.medGray, cursor: idx === 0 ? "default" : "pointer", fontSize: 16, padding: "4px" }}>↑</button>
+                <button onClick={(e) => { e.stopPropagation(); moveFaq(idx, 1); }}
+                  style={{ background: "none", border: "none", color: idx === faqs.length - 1 ? C.borderDark : C.medGray, cursor: idx === faqs.length - 1 ? "default" : "pointer", fontSize: 16, padding: "4px" }}>↓</button>
+                <button onClick={(e) => { e.stopPropagation(); deleteFaq(f.id); }}
+                  style={{ background: "none", border: "none", color: C.red, cursor: "pointer", fontSize: 16, padding: "4px" }}>×</button>
+              </div>
+            </div>
+          ))}
+          {faqs.length === 0 && <div style={{ color: C.medGray, textAlign: "center", padding: 40 }}>No FAQs yet. Create your first one!</div>}
+        </div>
+      ) : (
+        <div>
+          <button onClick={() => setEditing(null)} style={{ background: "none", border: "none", color: C.rust, cursor: "pointer", fontSize: 13, marginBottom: 16, fontFamily: "'DM Sans'" }}>
+            ← Back to all FAQs
+          </button>
+          <div style={{ backgroundColor: C.cardBg, borderRadius: 8, padding: 24 }}>
+            <AdminInput label="Question" value={faq.question} onChange={(v) => updateFaq(editing, { question: v })} />
+            <AdminInput label="Answer" value={faq.answer} onChange={(v) => updateFaq(editing, { answer: v })} multiline rows={6} />
+            <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+              <AdminButton onClick={() => { saveManifest(); setEditing(null); }} variant="success">Save FAQ</AdminButton>
+              <AdminButton onClick={() => deleteFaq(editing)} variant="danger">Delete FAQ</AdminButton>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ==================== MAIN ADMIN PANEL ====================
 
 const adminResponsiveCSS = `
@@ -794,6 +944,7 @@ export default function AdminPanel() {
   const sections = [
     { id: "portfolio", label: "Portfolio", icon: "🖼️" },
     { id: "blog", label: "Blog", icon: "📝" },
+    { id: "faq", label: "FAQ", icon: "❓" },
     { id: "about", label: "About", icon: "👤" },
     { id: "services", label: "Services", icon: "💼" },
     { id: "store", label: "Store", icon: "🛒" },
@@ -895,6 +1046,7 @@ export default function AdminPanel() {
         <div className="admin-content">
           {activeSection === "portfolio" && <PortfolioSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
           {activeSection === "blog" && <BlogSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
+          {activeSection === "faq" && <FAQSection manifest={manifest} setManifest={setManifest} saveManifest={saveManifest} />}
           {activeSection === "about" && <AboutSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
           {activeSection === "services" && <ServicesSection manifest={manifest} setManifest={setManifest} saveManifest={saveManifest} />}
           {activeSection === "store" && <StoreSection manifest={manifest} setManifest={setManifest} saveManifest={saveManifest} />}

@@ -25,6 +25,8 @@ const API_BASE = "https://api.527studios.com";
 const FALLBACK = {
   portfolio: [],
   blog: [],
+  faq: [],
+  customTags: [],
   about: {
     headline: "Great design begins with listening",
     bio: [
@@ -203,7 +205,7 @@ function Navigation({ currentPage, setPage }) {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const pages = ["Home", "Portfolio", "About", "Services", "Store", "Blog", "Contact"];
+  const pages = ["Home", "Portfolio", "About", "Services", "Store", "FAQ", "Contact"];
 
   return (
     <>
@@ -504,8 +506,9 @@ function HomePage({ setPage, manifest, onProjectClick }) {
 function PortfolioPage({ manifest, onProjectClick }) {
   const [activeFilter, setActiveFilter] = useState("All");
   const allProjects = manifest.portfolio || [];
-  const filters = ["All", "Brand Identity", "Editorial", "Print", "Apparel"];
-  const filtered = activeFilter === "All" ? allProjects : allProjects.filter((p) => (p.tags || []).some((t) => t.includes(activeFilter)));
+  const allTags = [...new Set((manifest.portfolio || []).flatMap(p => p.tags || []))].sort();
+  const filters = ["All", ...allTags];
+  const filtered = activeFilter === "All" ? allProjects : allProjects.filter((p) => (p.tags || []).includes(activeFilter));
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
       <p style={sectionLabel}>Portfolio</p>
@@ -769,6 +772,62 @@ function BlogPage({ manifest, onPostClick }) {
   );
 }
 
+function FAQPage({ manifest }) {
+  const faqs = manifest.faq || [];
+  const [openId, setOpenId] = useState(null);
+
+  if (faqs.length === 0) {
+    return (
+      <section className="section-padding section-padding-top" style={{ maxWidth: 800, margin: "0 auto" }}>
+        <p style={sectionLabel}>FAQ</p>
+        <h1 className="section-heading">FREQUENTLY ASKED<br /><span style={{ color: COLORS.rust }}>QUESTIONS</span></h1>
+        <div style={accentLine} />
+        <p style={{ textAlign: "center", color: COLORS.medGray, padding: "80px 0" }}>FAQs coming soon.</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="section-padding section-padding-top" style={{ maxWidth: 800, margin: "0 auto" }}>
+      <p style={sectionLabel}>FAQ</p>
+      <h1 className="section-heading">FREQUENTLY ASKED<br /><span style={{ color: COLORS.rust }}>QUESTIONS</span></h1>
+      <div style={accentLine} />
+      <p style={{ ...bodyText, marginBottom: 48 }}>Have a question about working together? Here are some answers to the most common ones.</p>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {faqs.map((faq) => {
+          const isOpen = openId === faq.id;
+          return (
+            <div key={faq.id} style={{ borderBottom: `1px solid ${COLORS.lightGray}` }}>
+              <button
+                onClick={() => setOpenId(isOpen ? null : faq.id)}
+                style={{
+                  width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center",
+                  padding: "24px 0", background: "none", border: "none", cursor: "pointer",
+                  fontFamily: "'DM Sans', sans-serif", textAlign: "left",
+                }}
+              >
+                <span style={{ fontSize: 18, fontWeight: 600, color: COLORS.charcoal, paddingRight: 24 }}>{faq.question}</span>
+                <span style={{
+                  fontSize: 24, color: COLORS.rust, flexShrink: 0, fontWeight: 300,
+                  transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+                  transition: "transform 0.3s ease",
+                }}>+</span>
+              </button>
+              <div style={{
+                maxHeight: isOpen ? 500 : 0, overflow: "hidden",
+                transition: "max-height 0.3s ease, padding 0.3s ease",
+                paddingBottom: isOpen ? 24 : 0,
+              }}>
+                <p style={{ fontSize: 15, lineHeight: 1.7, color: COLORS.medGray }}>{faq.answer}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function ContactPage({ manifest }) {
   const about = manifest.about || FALLBACK.about;
   const [formData, setFormData] = useState({ name: "", email: "", project: "", message: "" });
@@ -834,7 +893,7 @@ function Footer({ setPage, manifest }) {
           </div>
           <div>
             <h4 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: "0.15em", color: COLORS.cream, marginBottom: 16 }}>MORE</h4>
-            {["Store", "Blog", "Contact"].map((p) => <p key={p} style={{ fontSize: 14, color: COLORS.warmTan, marginBottom: 8, cursor: "pointer" }} onClick={() => { setPage(p); window.scrollTo(0, 0); }}>{p}</p>)}
+            {["Store", "FAQ", "Contact"].map((p) => <p key={p} style={{ fontSize: 14, color: COLORS.warmTan, marginBottom: 8, cursor: "pointer" }} onClick={() => { setPage(p); window.scrollTo(0, 0); }}>{p}</p>)}
           </div>
           <div>
             <h4 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: "0.15em", color: COLORS.cream, marginBottom: 16 }}>CONTACT</h4>
@@ -907,6 +966,7 @@ export default function App() {
       case "About": return <AboutPage manifest={manifest} />;
       case "Services": return <ServicesPage setPage={navigateTo} manifest={manifest} />;
       case "Store": return <StorePage manifest={manifest} />;
+      case "FAQ": return <FAQPage manifest={manifest} />;
       case "Blog": return <BlogPage manifest={manifest} onPostClick={(post) => { setSelectedPost(post); window.scrollTo(0, 0); }} />;
       case "Contact": return <ContactPage manifest={manifest} />;
       default: return <HomePage setPage={navigateTo} manifest={manifest} onProjectClick={handleProjectClick} />;
