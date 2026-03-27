@@ -109,6 +109,7 @@ const responsiveCSS = `
   .store-custom-row { display: flex; justify-content: space-between; align-items: center; }
   .filter-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 48px; }
   .hero-buttons { display: flex; gap: 16px; }
+  .hero-about-grid { display: grid; grid-template-columns: 1fr 400px; gap: 64px; align-items: center; }
 
   .featured-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
   .home-services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
@@ -138,6 +139,7 @@ const responsiveCSS = `
       gap: 24px;
     }
     .hero-heading { font-size: 38px; }
+    .hero-about-grid { grid-template-columns: 1fr; gap: 40px; }
     .section-heading { font-size: 36px; }
     .section-heading-md { font-size: 26px; }
     .projects-grid { grid-template-columns: 1fr; }
@@ -399,21 +401,42 @@ function ProjectDetailPage({ project, manifest, onBack, onNavigate }) {
   );
 }
 
-function HeroSection({ setPage }) {
+function HeroSection({ setPage, manifest }) {
+  const about = manifest.about || FALLBACK.about;
   return (
-    <section className="hero-padding" style={{ minHeight: "100vh", display: "flex", alignItems: "center" }}>
-      <div style={{ maxWidth: 800, margin: "0 auto", width: "100%", textAlign: "center" }}>
-        <p style={{ ...sectionLabel, textAlign: "center" }}>Graphic Design Studio</p>
-        <h1 className="hero-heading" style={{ textAlign: "center" }}>Good design begins<br />with <span style={{ color: COLORS.rust, fontStyle: "italic" }}>listening</span></h1>
-        <div style={{ ...accentLine, margin: "0 auto 32px" }} />
-        <p style={{ ...bodyText, textAlign: "center", margin: "0 auto 40px", maxWidth: 600 }}>Helping small businesses bring their ideas to life through clear, professional visuals that reflect who they are and what they offer.</p>
-        <div className="hero-buttons" style={{ justifyContent: "center" }}>
-          <button style={btnPrimary} onClick={() => { setPage("Portfolio"); window.scrollTo(0, 0); }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = COLORS.rustLight)}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.rust)}>View Work</button>
-          <button style={btnOutline} onClick={() => { setPage("Contact"); window.scrollTo(0, 0); }}
-            onMouseEnter={(e) => { e.target.style.backgroundColor = COLORS.charcoal; e.target.style.color = COLORS.white; }}
-            onMouseLeave={(e) => { e.target.style.backgroundColor = "transparent"; e.target.style.color = COLORS.charcoal; }}>Contact Me</button>
+    <section className="hero-padding" style={{ minHeight: "90vh", display: "flex", alignItems: "center" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", width: "100%" }}>
+        <div className="hero-about-grid">
+          <div>
+            <p style={sectionLabel}>Graphic Design Studio</p>
+            <h1 className="hero-heading">
+              I'm <span style={{ color: COLORS.rust, fontStyle: "italic" }}>James,</span>
+            </h1>
+            <p style={{ fontFamily: "'DM Serif Display', serif", fontSize: 28, lineHeight: 1.4, color: COLORS.charcoal, marginBottom: 32, fontWeight: 400 }}>
+              a graphic designer focused on helping small businesses bring their ideas to life through clear, thoughtful visual communication.
+            </p>
+            <div style={accentLine} />
+            <p style={{ ...bodyText, marginBottom: 40 }}>
+              {(about.bio || [])[0] || "I believe great design begins with listening. Through conversation, I take time to understand your goals and help shape those ideas into a clear direction."}
+            </p>
+            <div className="hero-buttons">
+              <button style={btnPrimary} onClick={() => { setPage("Portfolio"); window.scrollTo(0, 0); }}
+                onMouseEnter={(e) => (e.target.style.backgroundColor = COLORS.rustLight)}
+                onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.rust)}>View Work</button>
+              <button style={btnOutline} onClick={() => { setPage("Contact"); window.scrollTo(0, 0); }}
+                onMouseEnter={(e) => { e.target.style.backgroundColor = COLORS.charcoal; e.target.style.color = COLORS.white; }}
+                onMouseLeave={(e) => { e.target.style.backgroundColor = "transparent"; e.target.style.color = COLORS.charcoal; }}>Contact Me</button>
+            </div>
+          </div>
+          <div>
+            <div style={{ width: "100%", aspectRatio: "3/4", backgroundColor: COLORS.warmTan, borderRadius: 12, overflow: "hidden", boxShadow: "0 24px 56px rgba(0,0,0,0.10)" }}>
+              {about.headshot ? (
+                <img src={encodeURI(about.headshot)} alt="James Albanese" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              ) : (
+                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: COLORS.medGray, fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>Photo</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -635,10 +658,9 @@ function CTASection({ setPage }) {
 function HomePage({ setPage, manifest, onProjectClick }) {
   return (
     <>
-      <HeroSection setPage={setPage} />
+      <HeroSection setPage={setPage} manifest={manifest} />
       <FeaturedWork setPage={setPage} manifest={manifest} onProjectClick={onProjectClick} />
       <ServicesPreview setPage={setPage} manifest={manifest} />
-      <AboutPreview manifest={manifest} />
       <FAQPreview setPage={setPage} manifest={manifest} />
       <CTASection setPage={setPage} />
     </>
