@@ -66,10 +66,7 @@ const responsiveCSS = `
   .mobile-menu-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 1001; flex-direction: column; gap: 5px; }
   .mobile-overlay { display: none; }
 
-  .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-  .hero-right { display: block; }
   .hero-heading { font-family: 'Bebas Neue', sans-serif; font-size: 86px; line-height: 0.95; letter-spacing: 0.01em; color: ${COLORS.charcoal}; margin-bottom: 8px; }
-  .hero-bg-shape { display: block; }
   .section-heading { font-family: 'Bebas Neue', sans-serif; font-size: 64px; line-height: 1.0; letter-spacing: 0.02em; color: ${COLORS.charcoal}; margin-bottom: 24px; }
   .section-heading-md { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1.1; letter-spacing: 0.02em; color: ${COLORS.charcoal}; margin-bottom: 16px; }
 
@@ -120,9 +117,6 @@ const responsiveCSS = `
   @media (max-width: 1024px) {
     .services-grid { grid-template-columns: repeat(2, 1fr); }
     .about-grid { grid-template-columns: 1fr; }
-    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
-    .hero-right { display: none; }
-    .hero-bg-shape { display: none; }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
     .bento-grid { grid-template-columns: repeat(2, 1fr); }
     .featured-cards-grid { grid-template-columns: repeat(2, 1fr); }
@@ -404,43 +398,19 @@ function ProjectDetailPage({ project, manifest, onBack, onNavigate }) {
 
 function HeroSection({ setPage }) {
   return (
-    <section className="hero-padding" style={{ minHeight: "100vh", display: "flex", alignItems: "center", position: "relative", overflow: "hidden" }}>
-      <div className="hero-bg-shape" style={{ position: "absolute", top: 0, right: 0, width: "45%", height: "100%", backgroundColor: COLORS.warmTan, opacity: 0.25, clipPath: "polygon(20% 0, 100% 0, 100% 100%, 0% 100%)" }} />
-      <div style={{ maxWidth: 1280, margin: "0 auto", width: "100%", position: "relative", zIndex: 1 }}>
-        <div className="hero-grid">
-          <div>
-            <p style={sectionLabel}>Graphic Design Studio</p>
-            <h1 className="hero-heading">Great design<br />begins with<br /><span style={{ color: COLORS.rust }}>listening</span></h1>
-            <div style={accentLine} />
-            <p style={{ ...bodyText, marginBottom: 40 }}>Helping small businesses bring their ideas to life through clear, professional visuals that reflect who they are and what they offer.</p>
-            <div className="hero-buttons">
-              <button style={btnPrimary} onClick={() => { setPage("Portfolio"); window.scrollTo(0, 0); }}
-                onMouseEnter={(e) => (e.target.style.backgroundColor = COLORS.rustLight)}
-                onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.rust)}>View Work</button>
-              <button style={btnOutline} onClick={() => { setPage("Contact"); window.scrollTo(0, 0); }}
-                onMouseEnter={(e) => { e.target.style.backgroundColor = COLORS.charcoal; e.target.style.color = COLORS.white; }}
-                onMouseLeave={(e) => { e.target.style.backgroundColor = "transparent"; e.target.style.color = COLORS.charcoal; }}>Contact Me</button>
-            </div>
-          </div>
-          <div className="hero-right" style={{ position: "relative" }}>
-            <div style={{ width: "100%", aspectRatio: "4/5", backgroundColor: COLORS.warmTan, borderRadius: 12, position: "relative", overflow: "hidden", boxShadow: "0 32px 64px rgba(0,0,0,0.08)" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, backgroundColor: COLORS.rust }} />
-              <div style={{ padding: "48px 36px" }}>
-                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 36, color: COLORS.charcoal, marginBottom: 4 }}>JAMES ALBANESE</div>
-                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 16, color: COLORS.medGray, fontStyle: "italic", marginBottom: 32 }}>Graphic Designer</div>
-                {[{ label: "Brand Identity", color: COLORS.sage }, { label: "Editorial Design", color: COLORS.rust }, { label: "Apparel & Product", color: COLORS.charcoal }].map((item, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 0", borderBottom: i < 2 ? "1px solid rgba(0,0,0,0.08)" : "none" }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 8, backgroundColor: item.color, opacity: 0.8, flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 14, color: COLORS.charcoal }}>{item.label}</div>
-                      <div style={{ fontSize: 12, color: COLORS.medGray }}>View projects →</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div style={{ position: "absolute", bottom: -20, left: -20, width: 80, height: 80, border: `3px solid ${COLORS.rust}`, borderRadius: 12, opacity: 0.4 }} />
-          </div>
+    <section className="hero-padding" style={{ minHeight: "100vh", display: "flex", alignItems: "center" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto", width: "100%" }}>
+        <p style={sectionLabel}>Graphic Design Studio</p>
+        <h1 className="hero-heading">Great design<br />begins with<br /><span style={{ color: COLORS.rust }}>listening</span></h1>
+        <div style={accentLine} />
+        <p style={{ ...bodyText, marginBottom: 40 }}>Helping small businesses bring their ideas to life through clear, professional visuals that reflect who they are and what they offer.</p>
+        <div className="hero-buttons">
+          <button style={btnPrimary} onClick={() => { setPage("Portfolio"); window.scrollTo(0, 0); }}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = COLORS.rustLight)}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.rust)}>View Work</button>
+          <button style={btnOutline} onClick={() => { setPage("Contact"); window.scrollTo(0, 0); }}
+            onMouseEnter={(e) => { e.target.style.backgroundColor = COLORS.charcoal; e.target.style.color = COLORS.white; }}
+            onMouseLeave={(e) => { e.target.style.backgroundColor = "transparent"; e.target.style.color = COLORS.charcoal; }}>Contact Me</button>
         </div>
       </div>
     </section>
