@@ -67,8 +67,8 @@ const responsiveCSS = `
   .mobile-overlay { display: none; }
 
   .hero-heading { font-family: 'DM Serif Display', serif; font-size: 64px; line-height: 1.15; font-weight: 400; letter-spacing: -0.01em; color: ${COLORS.charcoal}; margin-bottom: 16px; }
-  .section-heading { font-family: 'Bebas Neue', sans-serif; font-size: 64px; line-height: 1.0; letter-spacing: 0.02em; color: ${COLORS.charcoal}; margin-bottom: 24px; }
-  .section-heading-md { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1.1; letter-spacing: 0.02em; color: ${COLORS.charcoal}; margin-bottom: 16px; }
+  .section-heading { font-family: 'DM Serif Display', serif; font-size: 52px; line-height: 1.1; letter-spacing: 0.01em; color: ${COLORS.charcoal}; margin-bottom: 24px; text-transform: none; font-weight: 400; }
+  .section-heading-md { font-family: 'DM Serif Display', serif; font-size: 36px; line-height: 1.15; letter-spacing: 0.01em; color: ${COLORS.charcoal}; margin-bottom: 16px; text-transform: none; font-weight: 400; }
 
   .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
   .projects-grid-2col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; }
@@ -138,8 +138,8 @@ const responsiveCSS = `
       gap: 24px;
     }
     .hero-heading { font-size: 38px; }
-    .section-heading { font-size: 42px; }
-    .section-heading-md { font-size: 30px; }
+    .section-heading { font-size: 36px; }
+    .section-heading-md { font-size: 26px; }
     .projects-grid { grid-template-columns: 1fr; }
     .projects-grid-2col { grid-template-columns: 1fr; }
     .bento-grid { grid-template-columns: 1fr; }
@@ -350,7 +350,7 @@ function ProjectDetailPage({ project, manifest, onBack, onNavigate }) {
             <span key={tag} style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: COLORS.rust }}>{tag}</span>
           ))}
         </div>
-        <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 56, lineHeight: 1.0, letterSpacing: "0.02em", color: COLORS.charcoal, marginBottom: 16 }}>{project.title}</h1>
+        <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 48, lineHeight: 1.1, letterSpacing: "0.01em", color: COLORS.charcoal, marginBottom: 16, fontWeight: 400 }}>{project.title}</h1>
         <div style={accentLine} />
         {project.description && <p style={{ ...bodyText }}>{project.description}</p>}
       </div>
@@ -424,7 +424,7 @@ function FeaturedWork({ setPage, manifest, onProjectClick }) {
     <section className="section-padding" style={{ maxWidth: 1280, margin: "0 auto", paddingTop: 80 }}>
       <div style={{ textAlign: "center", marginBottom: 56 }}>
         <p style={{ ...sectionLabel, textAlign: "center" }}>Selected Work</p>
-        <h2 className="section-heading" style={{ marginBottom: 0 }}>FEATURED WORK</h2>
+        <h2 className="section-heading" style={{ marginBottom: 0 }}>Featured Work</h2>
       </div>
       <div className="featured-cards-grid">
         {featured.slice(0, 3).map((p) => (
@@ -489,7 +489,7 @@ function ServicesPreview({ setPage, manifest }) {
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <p style={{ ...sectionLabel, textAlign: "center" }}>What I Do</p>
-          <h2 className="section-heading">SERVICES</h2>
+          <h2 className="section-heading">Services</h2>
         </div>
         <div className="home-services-grid">
           {(manifest.services || []).map((s, i) => (
@@ -536,7 +536,7 @@ function AboutPreview({ manifest }) {
         </div>
         <div>
           <p style={sectionLabel}>About 527 Studios</p>
-          <h2 className="section-heading"><span style={{ color: COLORS.rust }}>GREAT</span> DESIGN<br />BEGINS WITH LISTENING</h2>
+          <h2 className="section-heading">Good Design Begins<br />with <span style={{ color: COLORS.rust, fontStyle: "italic" }}>Listening</span></h2>
           <div style={accentLine} />
           <p style={{ ...bodyText, marginBottom: 24 }}>{firstBio}</p>
           {about.quote && (
@@ -570,7 +570,7 @@ function FAQPreview({ setPage, manifest }) {
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <p style={{ ...sectionLabel, textAlign: "center" }}>Common Questions</p>
-          <h2 className="section-heading">FREQUENTLY ASKED<br /><span style={{ color: COLORS.rust }}>QUESTIONS</span></h2>
+          <h2 className="section-heading">Frequently Asked<br /><span style={{ color: COLORS.rust, fontStyle: "italic" }}>Questions</span></h2>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           {faqs.map((faq) => {
@@ -616,7 +616,7 @@ function CTASection({ setPage }) {
   return (
     <section className="section-padding" style={{ textAlign: "center" }}>
       <div style={{ maxWidth: 640, margin: "0 auto" }}>
-        <h2 className="section-heading">LET'S WORK <span style={{ color: COLORS.rust }}>TOGETHER</span></h2>
+        <h2 className="section-heading">Let's Work <span style={{ color: COLORS.rust, fontStyle: "italic" }}>Together</span></h2>
         <div style={{ ...accentLine, margin: "0 auto 24px" }} />
         <p style={{ ...bodyText, margin: "0 auto 40px", textAlign: "center" }}>I enjoy helping people turn ideas into clear, thoughtful visual communication.</p>
         <button style={btnPrimary} onClick={() => { setPage("Contact"); window.scrollTo(0, 0); }}
@@ -650,9 +650,9 @@ function PortfolioPage({ manifest, onProjectClick }) {
   const filtered = activeFilter === "All" ? allProjects : allProjects.filter((p) => (p.tags || []).includes(activeFilter));
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
-      <p style={sectionLabel}>Portfolio</p>
-      <h1 className="section-heading">SELECTED WORK</h1>
-      <div style={accentLine} />
+      <p style={{ ...sectionLabel, textAlign: "center" }}>Portfolio</p>
+      <h1 className="section-heading" style={{ textAlign: "center" }}>Selected Work</h1>
+      <div style={{ ...accentLine, margin: "0 auto 32px" }} />
       <div className="filter-row">
         {filters.map((f) => (
           <button key={f} onClick={() => setActiveFilter(f)} style={{
@@ -694,7 +694,7 @@ function AboutPage({ manifest }) {
         </div>
         <div>
           <p style={sectionLabel}>About</p>
-          <h1 className="section-heading"><span style={{ color: COLORS.rust }}>GREAT</span> DESIGN<br />BEGINS WITH LISTENING</h1>
+          <h1 className="section-heading">Good Design Begins<br />with <span style={{ color: COLORS.rust, fontStyle: "italic" }}>Listening</span></h1>
           <div style={accentLine} />
           <div style={{ maxWidth: 560 }}>
             {(about.bio || []).map((paragraph, i) => (
@@ -724,16 +724,16 @@ function ServicesPage({ setPage, manifest }) {
   const srvcs = manifest.services || FALLBACK.services;
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
-      <p style={sectionLabel}>Services</p>
-      <h1 className="section-heading">WHAT I OFFER</h1>
-      <div style={accentLine} />
-      <p style={{ ...bodyText, marginBottom: 64 }}>Every project is approached with the same commitment to quality, clarity, and thoughtful execution.</p>
+      <p style={{ ...sectionLabel, textAlign: "center" }}>Services</p>
+      <h1 className="section-heading" style={{ textAlign: "center" }}>What I Offer</h1>
+      <div style={{ ...accentLine, margin: "0 auto 32px" }} />
+      <p style={{ ...bodyText, marginBottom: 64, textAlign: "center", margin: "0 auto 64px", maxWidth: 600 }}>Every project is approached with the same commitment to quality, clarity, and thoughtful execution.</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
         {srvcs.map((s, i) => (
           <div key={i} className="service-detail-grid" style={{ padding: "48px 24px", backgroundColor: i % 2 === 0 ? COLORS.offWhite : COLORS.cream, border: `1px solid ${COLORS.lightGray}`, borderRadius: 8 }}>
             <div>
               {s.icon && <img src={encodeURI(s.icon)} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover", marginBottom: 16, display: "block" }} />}
-              <h3 className="section-heading-md" style={{ marginBottom: 8 }}>{s.name.toUpperCase()}</h3>
+              <h3 className="section-heading-md" style={{ marginBottom: 8 }}>{s.name}</h3>
               <div style={{ ...accentLine, width: 48, marginBottom: 16 }} />
               <p style={{ ...bodyText, marginBottom: 16 }}>{s.description}</p>
               <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, color: COLORS.rust }}>{s.price}</div>
@@ -752,7 +752,7 @@ function ServicesPage({ setPage, manifest }) {
         ))}
       </div>
       <div style={{ textAlign: "center", marginTop: 64, padding: "48px 24px", backgroundColor: COLORS.warmTan, borderRadius: 8 }}>
-        <h3 className="section-heading-md">NEED SOMETHING CUSTOM?</h3>
+        <h3 className="section-heading-md">Need Something Custom?</h3>
         <p style={{ ...bodyText, margin: "0 auto 32px", textAlign: "center" }}>Every business is different. Let's talk about what you need.</p>
         <button style={btnPrimary} onClick={() => { setPage("Contact"); window.scrollTo(0, 0); }}
           onMouseEnter={(e) => (e.target.style.backgroundColor = COLORS.rustLight)}
@@ -766,10 +766,10 @@ function StorePage({ manifest }) {
   const packages = manifest.store || FALLBACK.store;
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
-      <p style={sectionLabel}>Store</p>
-      <h1 className="section-heading">DESIGN PACKAGES</h1>
-      <div style={accentLine} />
-      <p style={{ ...bodyText, marginBottom: 64 }}>Ready-to-go design packages with clear deliverables and transparent pricing.</p>
+      <p style={{ ...sectionLabel, textAlign: "center" }}>Store</p>
+      <h1 className="section-heading" style={{ textAlign: "center" }}>Design Packages</h1>
+      <div style={{ ...accentLine, margin: "0 auto 32px" }} />
+      <p style={{ ...bodyText, marginBottom: 64, textAlign: "center", margin: "0 auto 64px", maxWidth: 600 }}>Ready-to-go design packages with clear deliverables and transparent pricing.</p>
       <div className="store-grid">
         {packages.map((pkg, i) => (
           <div key={i} style={{
@@ -779,7 +779,7 @@ function StorePage({ manifest }) {
           }}>
             {pkg.popular && <div style={{ position: "absolute", top: -1, left: 0, right: 0, height: 4, backgroundColor: COLORS.rust, borderRadius: "8px 8px 0 0" }} />}
             {pkg.popular && <span style={{ display: "inline-block", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: COLORS.rust, marginBottom: 16 }}>Most Popular</span>}
-            <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, marginBottom: 4 }}>{pkg.name}</h3>
+            <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 28, marginBottom: 4, fontWeight: 400 }}>{pkg.name}</h3>
             <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 36, color: COLORS.rust, marginBottom: 16 }}>{pkg.price}</div>
             <p style={{ fontSize: 14, color: pkg.popular ? COLORS.warmTan : COLORS.medGray, lineHeight: 1.6, marginBottom: 24 }}>{pkg.description}</p>
             <div style={{ borderTop: `1px solid ${pkg.popular ? "rgba(255,255,255,0.1)" : COLORS.lightGray}`, paddingTop: 24, marginBottom: 32 }}>
@@ -801,7 +801,7 @@ function StorePage({ manifest }) {
       </div>
       <div className="store-custom-row" style={{ marginTop: 64, padding: "40px 24px", backgroundColor: COLORS.offWhite, border: `1px solid ${COLORS.lightGray}`, borderRadius: 8 }}>
         <div>
-          <h4 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, marginBottom: 4 }}>NEED A CUSTOM PACKAGE?</h4>
+          <h4 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, marginBottom: 4 }}>Need a Custom Package?</h4>
           <p style={{ fontSize: 14, color: COLORS.medGray }}>Have something specific in mind? Let's build a custom scope together.</p>
         </div>
         <button style={{ ...btnOutline, whiteSpace: "nowrap" }}>Contact Me</button>
@@ -836,7 +836,7 @@ function BlogDetailPage({ post, manifest, onBack, onNavigate }) {
         <span style={{ fontSize: 12, color: COLORS.medGray }}>{post.readTime}</span>
       </div>
 
-      <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 48, lineHeight: 1.0, letterSpacing: "0.02em", color: COLORS.charcoal, marginBottom: 12 }}>{post.title}</h1>
+      <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 42, lineHeight: 1.15, letterSpacing: "0.01em", color: COLORS.charcoal, marginBottom: 12, fontWeight: 400 }}>{post.title}</h1>
       <p style={{ fontSize: 14, color: COLORS.medGray, marginBottom: 24 }}>{post.date}</p>
       <div style={accentLine} />
 
@@ -873,9 +873,9 @@ function BlogPage({ manifest, onPostClick }) {
   if (posts.length === 0) {
     return (
       <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
-        <p style={sectionLabel}>Blog</p>
-        <h1 className="section-heading">INSIGHTS & PROCESS</h1>
-        <div style={accentLine} />
+        <p style={{ ...sectionLabel, textAlign: "center" }}>Blog</p>
+        <h1 className="section-heading" style={{ textAlign: "center" }}>Insights & Process</h1>
+        <div style={{ ...accentLine, margin: "0 auto 32px" }} />
         <p style={{ textAlign: "center", color: COLORS.medGray, padding: "80px 0" }}>Blog posts coming soon. Check back later!</p>
       </section>
     );
@@ -919,9 +919,9 @@ function FAQPage({ manifest }) {
   if (faqs.length === 0) {
     return (
       <section className="section-padding section-padding-top" style={{ maxWidth: 800, margin: "0 auto" }}>
-        <p style={sectionLabel}>FAQ</p>
-        <h1 className="section-heading">FREQUENTLY ASKED<br /><span style={{ color: COLORS.rust }}>QUESTIONS</span></h1>
-        <div style={accentLine} />
+        <p style={{ ...sectionLabel, textAlign: "center" }}>FAQ</p>
+        <h1 className="section-heading" style={{ textAlign: "center" }}>Frequently Asked <span style={{ color: COLORS.rust, fontStyle: "italic" }}>Questions</span></h1>
+        <div style={{ ...accentLine, margin: "0 auto 32px" }} />
         <p style={{ textAlign: "center", color: COLORS.medGray, padding: "80px 0" }}>FAQs coming soon.</p>
       </section>
     );
@@ -979,7 +979,7 @@ function ContactPage({ manifest }) {
       <div className="contact-grid">
         <div>
           <p style={sectionLabel}>Contact</p>
-          <h1 className="section-heading">LET'S START A<br /><span style={{ color: COLORS.rust }}>CONVERSATION</span></h1>
+          <h1 className="section-heading">Let's Start a<br /><span style={{ color: COLORS.rust, fontStyle: "italic" }}>Conversation</span></h1>
           <div style={accentLine} />
           <p style={{ ...bodyText, marginBottom: 48 }}>Whether you have a clear vision or just a rough idea, I'd love to hear about your project. Reach out and let's talk about how we can bring it to life.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
