@@ -669,7 +669,7 @@ function AboutSection({ manifest, setManifest, token, saveManifest }) {
 
 // ==================== SECTION: SERVICES ====================
 
-function ServicesSection({ manifest, setManifest, saveManifest }) {
+function ServicesSection({ manifest, setManifest, token, saveManifest }) {
   const [editing, setEditing] = useState(null);
 
   const updateService = (id, updates) => {
@@ -705,6 +705,20 @@ function ServicesSection({ manifest, setManifest, saveManifest }) {
             ← Back to services
           </button>
           <div style={{ backgroundColor: C.cardBg, borderRadius: 8, padding: 24 }}>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: C.medGray, marginBottom: 8 }}>Service Icon</label>
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                {service.icon ? (
+                  <img src={service.icon} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover", display: "block" }} />
+                ) : (
+                  <div style={{ width: 56, height: 56, borderRadius: 8, backgroundColor: C.borderDark, display: "flex", alignItems: "center", justifyContent: "center", color: C.medGray, fontSize: 11 }}>No icon</div>
+                )}
+                <div style={{ flex: 1 }}>
+                  <ImageUploader token={token} folder={`services/${service.id}`} label="Upload icon"
+                    onUpload={({ publicUrl }) => updateService(editing, { icon: publicUrl })} />
+                </div>
+              </div>
+            </div>
             <AdminInput label="Service Name" value={service.name} onChange={(v) => updateService(editing, { name: v })} />
             <AdminInput label="Price" value={service.price} onChange={(v) => updateService(editing, { price: v })} />
             <AdminInput label="Description" value={service.description} onChange={(v) => updateService(editing, { description: v })} multiline rows={3} />
@@ -1063,7 +1077,7 @@ export default function AdminPanel() {
           {activeSection === "blog" && <BlogSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
           {activeSection === "faq" && <FAQSection manifest={manifest} setManifest={setManifest} saveManifest={saveManifest} />}
           {activeSection === "about" && <AboutSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
-          {activeSection === "services" && <ServicesSection manifest={manifest} setManifest={setManifest} saveManifest={saveManifest} />}
+          {activeSection === "services" && <ServicesSection manifest={manifest} setManifest={setManifest} token={token} saveManifest={saveManifest} />}
           {activeSection === "store" && <StoreSection manifest={manifest} setManifest={setManifest} saveManifest={saveManifest} />}
         </div>
       </div>

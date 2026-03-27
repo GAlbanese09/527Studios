@@ -494,11 +494,15 @@ function ServicesPreview({ setPage, manifest }) {
         <div className="home-services-grid">
           {(manifest.services || []).map((s, i) => (
             <div key={i} style={{ textAlign: "center", padding: "32px 20px", backgroundColor: COLORS.white, borderRadius: 8, border: `1px solid ${COLORS.lightGray}` }}>
-              <div style={{
-                width: 52, height: 52, borderRadius: "50%", backgroundColor: iconColors[i % iconColors.length],
-                display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px",
-                color: COLORS.white, fontFamily: "'Bebas Neue', sans-serif", fontSize: 22,
-              }}>{s.name.charAt(0)}</div>
+              {s.icon ? (
+                <img src={encodeURI(s.icon)} alt="" style={{ width: 52, height: 52, borderRadius: 8, objectFit: "cover", margin: "0 auto 20px", display: "block" }} />
+              ) : (
+                <div style={{
+                  width: 52, height: 52, borderRadius: "50%", backgroundColor: iconColors[i % iconColors.length],
+                  display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px",
+                  color: COLORS.white, fontFamily: "'Bebas Neue', sans-serif", fontSize: 22,
+                }}>{s.name.charAt(0)}</div>
+              )}
               <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 18, color: COLORS.charcoal, marginBottom: 8 }}>{s.name}</h3>
               <p style={{ fontSize: 14, color: COLORS.medGray, lineHeight: 1.6 }}>{s.description}</p>
             </div>
@@ -728,6 +732,7 @@ function ServicesPage({ setPage, manifest }) {
         {srvcs.map((s, i) => (
           <div key={i} className="service-detail-grid" style={{ padding: "48px 24px", backgroundColor: i % 2 === 0 ? COLORS.offWhite : COLORS.cream, border: `1px solid ${COLORS.lightGray}`, borderRadius: 8 }}>
             <div>
+              {s.icon && <img src={encodeURI(s.icon)} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover", marginBottom: 16, display: "block" }} />}
               <h3 className="section-heading-md" style={{ marginBottom: 8 }}>{s.name.toUpperCase()}</h3>
               <div style={{ ...accentLine, width: 48, marginBottom: 16 }} />
               <p style={{ ...bodyText, marginBottom: 16 }}>{s.description}</p>
