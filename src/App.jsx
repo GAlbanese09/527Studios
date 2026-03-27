@@ -39,7 +39,7 @@ const FALLBACK = {
     specialties: ["Brand Identity", "Editorial Design", "Print Production", "Apparel & Product Design"],
     tools: ["Adobe Creative Suite", "Print Production", "Typography & Layout", "Color Theory"],
     location: "Altamonte Springs, FL",
-    email: "Jalbanese79@gmail.com",
+    email: "james@527studios.com",
     phone: "407.516.6193",
   },
   services: [
@@ -787,7 +787,7 @@ function ServicesPage({ setPage, manifest }) {
   );
 }
 
-function StorePage({ manifest }) {
+function StorePage({ manifest, setPage }) {
   const packages = manifest.store || FALLBACK.store;
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
@@ -820,7 +820,7 @@ function StorePage({ manifest }) {
               backgroundColor: pkg.popular ? COLORS.rust : "transparent",
               color: pkg.popular ? COLORS.white : COLORS.charcoal,
               border: pkg.popular ? "none" : `2px solid ${COLORS.charcoal}`,
-            }}>Get Started</button>
+            }} onClick={() => { setPage("Contact"); window.scrollTo(0, 0); }}>Get Started</button>
           </div>
         ))}
       </div>
@@ -829,7 +829,7 @@ function StorePage({ manifest }) {
           <h4 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, marginBottom: 4 }}>Need a Custom Package?</h4>
           <p style={{ fontSize: 14, color: COLORS.medGray }}>Have something specific in mind? Let's build a custom scope together.</p>
         </div>
-        <button style={{ ...btnOutline, whiteSpace: "nowrap" }}>Contact Me</button>
+        <button style={{ ...btnOutline, whiteSpace: "nowrap" }} onClick={() => { setPage("Contact"); window.scrollTo(0, 0); }}>Contact Me</button>
       </div>
     </section>
   );
@@ -996,8 +996,51 @@ function FAQPage({ manifest }) {
 function ContactPage({ manifest }) {
   const about = manifest.about || FALLBACK.about;
   const [formData, setFormData] = useState({ name: "", email: "", project: "", message: "" });
+  const [status, setStatus] = useState("idle");
+  const [touched, setTouched] = useState({});
   const inputStyle = { width: "100%", padding: "12px 16px", fontSize: 15, fontFamily: "'DM Sans', sans-serif", border: `1.5px solid ${COLORS.lightGray}`, borderRadius: 4, backgroundColor: COLORS.white, color: COLORS.charcoal, outline: "none", boxSizing: "border-box" };
   const labelStyle = { display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: COLORS.charcoal, marginBottom: 8 };
+
+  const requiredFields = ["name", "email", "message"];
+  const hasErrors = requiredFields.some((k) => touched[k] && !formData[k].trim());
+  const allFilled = requiredFields.every((k) => formData[k].trim());
+
+  const handleSubmit = async () => {
+    const newTouched = {};
+    requiredFields.forEach((k) => (newTouched[k] = true));
+    setTouched(newTouched);
+    if (!allFilled) return;
+    setStatus("sending");
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_key: "68804e5c-1ddb-4a65-9ed5-14323d4d90ae",
+          name: formData.name,
+          email: formData.email,
+          project_type: formData.project,
+          message: formData.message,
+          subject: `New inquiry from ${formData.name} — 527 Studios`,
+          from_name: "527 Studios Contact Form",
+          botcheck: "",
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setStatus("success");
+        setFormData({ name: "", email: "", project: "", message: "" });
+        setTouched({});
+        setTimeout(() => setStatus("idle"), 5000);
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  const fieldBorder = (key) => touched[key] && !formData[key].trim() ? "#c0392b" : COLORS.lightGray;
 
   return (
     <section className="section-padding section-padding-top" style={{ maxWidth: 1280, margin: "0 auto" }}>
@@ -1008,7 +1051,7 @@ function ContactPage({ manifest }) {
           <div style={accentLine} />
           <p style={{ ...bodyText, marginBottom: 48 }}>Whether you have a clear vision or just a rough idea, I'd love to hear about your project. Reach out and let's talk about how we can bring it to life.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            {[{ label: "Email", value: about.email || "Jalbanese79@gmail.com" }, { label: "Phone", value: about.phone || "407.516.6193" }, { label: "Location", value: about.location || "Altamonte Springs, FL" }].map((item) => (
+            {[{ label: "Email", value: about.email || "james@527studios.com" }, { label: "Phone", value: about.phone || "407.516.6193" }, { label: "Location", value: about.location || "Altamonte Springs, FL" }].map((item) => (
               <div key={item.label}>
                 <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: COLORS.medGray, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 16, color: COLORS.charcoal }}>{item.value}</div>
@@ -1017,24 +1060,30 @@ function ContactPage({ manifest }) {
           </div>
         </div>
         <div style={{ padding: "40px 24px", backgroundColor: COLORS.offWhite, border: `1px solid ${COLORS.lightGray}`, borderRadius: 8 }}>
+          <input type="hidden" name="botcheck" value="" />
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            {[{ key: "name", label: "Name", type: "text", ph: "Your name" }, { key: "email", label: "Email", type: "email", ph: "your@email.com" }, { key: "project", label: "Project Type", type: "text", ph: "Brand Identity, Editorial, etc." }].map((f) => (
+            {[{ key: "name", label: "Name *", type: "text", ph: "Your name" }, { key: "email", label: "Email *", type: "email", ph: "your@email.com" }, { key: "project", label: "Project Type", type: "text", ph: "Brand Identity, Editorial, etc." }].map((f) => (
               <div key={f.key}>
                 <label style={labelStyle}>{f.label}</label>
-                <input type={f.type} placeholder={f.ph} value={formData[f.key]} onChange={(e) => setFormData({ ...formData, [f.key]: e.target.value })} style={inputStyle}
-                  onFocus={(e) => (e.target.style.borderColor = COLORS.rust)} onBlur={(e) => (e.target.style.borderColor = COLORS.lightGray)} />
+                <input type={f.type} placeholder={f.ph} value={formData[f.key]} onChange={(e) => setFormData({ ...formData, [f.key]: e.target.value })} style={{ ...inputStyle, borderColor: fieldBorder(f.key) }}
+                  onFocus={(e) => (e.target.style.borderColor = COLORS.rust)} onBlur={(e) => { setTouched({ ...touched, [f.key]: true }); e.target.style.borderColor = fieldBorder(f.key); }} />
               </div>
             ))}
             <div>
-              <label style={labelStyle}>Message</label>
+              <label style={labelStyle}>Message *</label>
               <textarea rows={5} placeholder="Tell me about your project..." value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                style={{ ...inputStyle, resize: "vertical" }}
-                onFocus={(e) => (e.target.style.borderColor = COLORS.rust)} onBlur={(e) => (e.target.style.borderColor = COLORS.lightGray)} />
+                style={{ ...inputStyle, resize: "vertical", borderColor: fieldBorder("message") }}
+                onFocus={(e) => (e.target.style.borderColor = COLORS.rust)} onBlur={(e) => { setTouched({ ...touched, message: true }); e.target.style.borderColor = fieldBorder("message"); }} />
             </div>
-            <button style={{ ...btnPrimary, width: "100%", textAlign: "center", borderRadius: 4, marginTop: 8 }}
+            {hasErrors && <p style={{ fontSize: 14, color: "#c0392b", margin: 0 }}>Please fill in all required fields.</p>}
+            {status === "success" && <p style={{ fontSize: 14, color: "#27ae60", margin: 0 }}>Thank you! Your message has been sent. I'll get back to you soon.</p>}
+            {status === "error" && <p style={{ fontSize: 14, color: "#c0392b", margin: 0 }}>Something went wrong. Please try again or email james@527studios.com directly.</p>}
+            <button style={{ ...btnPrimary, width: "100%", textAlign: "center", borderRadius: 4, marginTop: 8, opacity: status === "sending" ? 0.6 : 1 }}
+              disabled={status === "sending"}
+              onClick={handleSubmit}
               onMouseEnter={(e) => (e.target.style.backgroundColor = COLORS.rustLight)}
-              onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.rust)}>Send Message</button>
+              onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.rust)}>{status === "sending" ? "Sending..." : "Send Message"}</button>
           </div>
         </div>
       </div>
@@ -1130,7 +1179,7 @@ export default function App() {
       case "Portfolio": return <PortfolioPage manifest={manifest} onProjectClick={handleProjectClick} />;
       case "About": return <AboutPage manifest={manifest} />;
       case "Services": return <ServicesPage setPage={navigateTo} manifest={manifest} />;
-      case "Store": return <StorePage manifest={manifest} />;
+      case "Store": return <StorePage manifest={manifest} setPage={navigateTo} />;
       case "FAQ": return <FAQPage manifest={manifest} />;
       case "Blog": return <BlogPage manifest={manifest} onPostClick={(post) => { setSelectedPost(post); window.scrollTo(0, 0); }} />;
       case "Contact": return <ContactPage manifest={manifest} />;
