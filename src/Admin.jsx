@@ -708,11 +708,24 @@ function ServicesSection({ manifest, setManifest, token, saveManifest }) {
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: C.medGray, marginBottom: 8 }}>Service Icon</label>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                {service.icon ? (
-                  <img src={service.icon} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover", display: "block" }} />
-                ) : (
-                  <div style={{ width: 56, height: 56, borderRadius: 8, backgroundColor: C.borderDark, display: "flex", alignItems: "center", justifyContent: "center", color: C.medGray, fontSize: 11 }}>No icon</div>
-                )}
+                <div style={{ position: "relative", flexShrink: 0 }}>
+                  {service.icon ? (
+                    <>
+                      <img src={service.icon} alt="" style={{ width: 80, height: 80, borderRadius: 8, objectFit: "cover", display: "block" }} />
+                      <button
+                        onClick={() => updateService(editing, { icon: "" })}
+                        style={{
+                          position: "absolute", top: -6, right: -6, width: 20, height: 20,
+                          borderRadius: "50%", backgroundColor: C.red, color: C.white,
+                          border: "none", cursor: "pointer", fontSize: 11, display: "flex",
+                          alignItems: "center", justifyContent: "center",
+                        }}
+                      >×</button>
+                    </>
+                  ) : (
+                    <div style={{ width: 80, height: 80, borderRadius: 8, backgroundColor: C.borderDark, display: "flex", alignItems: "center", justifyContent: "center", color: C.medGray, fontSize: 11 }}>No icon</div>
+                  )}
+                </div>
                 <div style={{ flex: 1 }}>
                   <ImageUploader token={token} folder={`services/${service.id}`} label="Upload icon"
                     onUpload={({ publicUrl }) => updateService(editing, { icon: publicUrl })} />
