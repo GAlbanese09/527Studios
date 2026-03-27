@@ -452,57 +452,83 @@ function PortfolioSection({ manifest, setManifest, token, saveManifest }) {
               </div>
             </div>
 
-            <div style={{ marginTop: 24, marginBottom: 16 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: C.medGray, marginBottom: 12 }}>Project Images</label>
+            {/* ---- COVER IMAGE ---- */}
+            <div style={{ marginTop: 24, marginBottom: 24, padding: 20, backgroundColor: C.darkBg, borderRadius: 8, border: `1px solid ${C.borderDark}` }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: C.medGray, marginBottom: 4 }}>Cover Image</label>
+              <div style={{ fontSize: 10, color: C.borderDark, marginBottom: 12 }}>This image appears as the hero at the top of your project page</div>
+              {project.coverImage ? (
+                <div style={{ position: "relative", display: "inline-block", marginBottom: 12 }}>
+                  <img src={project.coverImage} alt="Cover" style={{ width: 200, height: 130, objectFit: "cover", borderRadius: 6, display: "block" }} />
+                  <button
+                    onClick={() => updateProject(editing, { coverImage: "" })}
+                    style={{
+                      position: "absolute", top: 4, right: 4, padding: "3px 8px", fontSize: 10, fontWeight: 600,
+                      backgroundColor: C.red, color: C.white, border: "none", borderRadius: 3, cursor: "pointer",
+                      fontFamily: "'DM Sans'",
+                    }}
+                  >Remove</button>
+                </div>
+              ) : null}
               <ImageUploader
                 token={token}
                 folder={`portfolio/${project.id}`}
-                label="Upload project images"
+                label={project.coverImage ? "Replace cover image" : "Upload cover image"}
                 onUpload={({ key, publicUrl, filename }) => {
                   const title = filename.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
-                  const newImages = [...(project.images || []), { key, url: publicUrl, title, order: (project.images || []).length }];
-                  updateProject(editing, { images: newImages, coverImage: project.coverImage || publicUrl });
+                  // Set as cover; also add to images array so it's tracked in R2
+                  const alreadyInImages = (project.images || []).some(img => img.url === publicUrl);
+                  const newImages = alreadyInImages ? (project.images || []) : [...(project.images || []), { key, url: publicUrl, title, order: (project.images || []).length }];
+                  updateProject(editing, { coverImage: publicUrl, images: newImages });
                 }}
               />
             </div>
 
-            {(project.images || []).length > 0 && (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12, marginTop: 16 }}>
-                {project.images.map((img, idx) => (
-                  <div key={idx} style={{ position: "relative", borderRadius: 6, overflow: "hidden" }}>
-                    <img src={img.url} alt={img.title} style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }} />
-                    <div style={{ padding: "6px 8px", backgroundColor: C.darkBg, fontSize: 11, color: C.medGray }}>{img.title}</div>
-                    <button
-                      onClick={async () => {
-                        await fetch(`${API_BASE}/api/image`, {
-                          method: "DELETE",
-                          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                          body: JSON.stringify({ key: img.key }),
-                        });
-                        const newImages = project.images.filter((_, i) => i !== idx);
-                        updateProject(editing, { images: newImages });
-                      }}
-                      style={{
-                        position: "absolute", top: 4, right: 4, width: 20, height: 20,
-                        borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.7)", color: C.white,
-                        border: "none", cursor: "pointer", fontSize: 11, display: "flex",
-                        alignItems: "center", justifyContent: "center",
-                      }}
-                    >×</button>
-                    {project.coverImage !== img.url && (
-                      <button
-                        onClick={() => updateProject(editing, { coverImage: img.url })}
-                        style={{
-                          position: "absolute", bottom: 30, left: 4, fontSize: 9,
-                          padding: "2px 6px", backgroundColor: "rgba(0,0,0,0.7)", color: C.white,
-                          border: "none", cursor: "pointer", borderRadius: 3,
-                        }}
-                      >Set Cover</button>
-                    )}
+            {/* ---- PROJECT IMAGES (BODY) ---- */}
+            <div style={{ marginBottom: 16, padding: 20, backgroundColor: C.darkBg, borderRadius: 8, border: `1px solid ${C.borderDark}` }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: C.medGray, marginBottom: 4 }}>Project Images (Body)</label>
+              <div style={{ fontSize: 10, color: C.borderDark, marginBottom: 12 }}>These images appear in the gallery below the cover</div>
+              <ImageUploader
+                token={token}
+                folder={`portfolio/${project.id}`}
+                label="Upload body images"
+                onUpload={({ key, publicUrl, filename }) => {
+                  const title = filename.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+                  const newImages = [...(project.images || []), { key, url: publicUrl, title, order: (project.images || []).length }];
+                  updateProject(editing, { images: newImages });
+                }}
+              />
+
+              {(() => {
+                const bodyImages = (project.images || []).filter(img => img.url !== project.coverImage);
+                return bodyImages.length > 0 && (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12, marginTop: 16 }}>
+                    {bodyImages.map((img, idx) => (
+                      <div key={idx} style={{ position: "relative", borderRadius: 6, overflow: "hidden" }}>
+                        <img src={img.url} alt={img.title} style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }} />
+                        <div style={{ padding: "6px 8px", backgroundColor: C.panelBg, fontSize: 11, color: C.medGray }}>{img.title}</div>
+                        <button
+                          onClick={async () => {
+                            await fetch(`${API_BASE}/api/image`, {
+                              method: "DELETE",
+                              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                              body: JSON.stringify({ key: img.key }),
+                            });
+                            const newImages = (project.images || []).filter(i => i.url !== img.url);
+                            updateProject(editing, { images: newImages });
+                          }}
+                          style={{
+                            position: "absolute", top: 4, right: 4, width: 20, height: 20,
+                            borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.7)", color: C.white,
+                            border: "none", cursor: "pointer", fontSize: 11, display: "flex",
+                            alignItems: "center", justifyContent: "center",
+                          }}
+                        >×</button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+                );
+              })()}
+            </div>
 
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <AdminButton onClick={() => { saveManifest(); setEditing(null); }} variant="success">Save Project</AdminButton>

@@ -355,23 +355,26 @@ function ProjectDetailPage({ project, manifest, onBack, onNavigate }) {
         {project.description && <p style={{ ...bodyText }}>{project.description}</p>}
       </div>
 
-      {/* Image gallery */}
-      {(project.images || []).length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 32, marginBottom: 64 }}>
-          {project.images.map((img, idx) => (
-            <div key={idx} style={{ borderRadius: 8, overflow: "hidden", backgroundColor: "#f0ece4" }}>
-              <img
-                src={encodeURI(img.url || "")}
-                alt={img.title || ""}
-                style={{ width: "100%", height: "auto", display: "block" }}
-              />
-              {img.title && (
-                <div style={{ padding: "12px 16px", fontSize: 14, color: COLORS.medGray }}>{img.title}</div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Image gallery — excluding cover image to avoid duplication */}
+      {(() => {
+        const bodyImages = (project.images || []).filter(img => img.url !== project.coverImage);
+        return bodyImages.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 32, marginBottom: 64 }}>
+            {bodyImages.map((img, idx) => (
+              <div key={idx} style={{ borderRadius: 8, overflow: "hidden", backgroundColor: "#f0ece4" }}>
+                <img
+                  src={encodeURI(img.url || "")}
+                  alt={img.title || ""}
+                  style={{ width: "100%", height: "auto", display: "block" }}
+                />
+                {img.title && (
+                  <div style={{ padding: "12px 16px", fontSize: 14, color: COLORS.medGray }}>{img.title}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      })()}
 
       {/* Next/Previous navigation */}
       <div className="project-nav" style={{ borderTop: `1px solid ${COLORS.lightGray}`, paddingTop: 32 }}>
