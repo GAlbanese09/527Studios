@@ -66,7 +66,7 @@ const responsiveCSS = `
   .mobile-menu-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 1001; flex-direction: column; gap: 5px; }
   .mobile-overlay { display: none; }
 
-  .hero-heading { font-family: 'Bebas Neue', sans-serif; font-size: 86px; line-height: 0.95; letter-spacing: 0.01em; color: ${COLORS.charcoal}; margin-bottom: 8px; }
+  .hero-heading { font-family: 'DM Serif Display', serif; font-size: 64px; line-height: 1.15; font-weight: 400; letter-spacing: -0.01em; color: ${COLORS.charcoal}; margin-bottom: 16px; }
   .section-heading { font-family: 'Bebas Neue', sans-serif; font-size: 64px; line-height: 1.0; letter-spacing: 0.02em; color: ${COLORS.charcoal}; margin-bottom: 24px; }
   .section-heading-md { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1.1; letter-spacing: 0.02em; color: ${COLORS.charcoal}; margin-bottom: 16px; }
 
@@ -137,7 +137,7 @@ const responsiveCSS = `
       justify-content: center;
       gap: 24px;
     }
-    .hero-heading { font-size: 52px; }
+    .hero-heading { font-size: 38px; }
     .section-heading { font-size: 42px; }
     .section-heading-md { font-size: 30px; }
     .projects-grid { grid-template-columns: 1fr; }
@@ -401,7 +401,7 @@ function HeroSection({ setPage }) {
     <section className="hero-padding" style={{ minHeight: "100vh", display: "flex", alignItems: "center" }}>
       <div style={{ maxWidth: 800, margin: "0 auto", width: "100%", textAlign: "center" }}>
         <p style={{ ...sectionLabel, textAlign: "center" }}>Graphic Design Studio</p>
-        <h1 className="hero-heading" style={{ textAlign: "center" }}>Great design<br />begins with<br /><span style={{ color: COLORS.rust }}>listening</span></h1>
+        <h1 className="hero-heading" style={{ textAlign: "center" }}>Good design begins<br />with <span style={{ color: COLORS.rust, fontStyle: "italic" }}>listening</span></h1>
         <div style={{ ...accentLine, margin: "0 auto 32px" }} />
         <p style={{ ...bodyText, textAlign: "center", margin: "0 auto 40px", maxWidth: 600 }}>Helping small businesses bring their ideas to life through clear, professional visuals that reflect who they are and what they offer.</p>
         <div className="hero-buttons" style={{ justifyContent: "center" }}>
