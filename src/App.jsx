@@ -399,12 +399,12 @@ function ProjectDetailPage({ project, manifest, onBack, onNavigate }) {
 function HeroSection({ setPage }) {
   return (
     <section className="hero-padding" style={{ minHeight: "100vh", display: "flex", alignItems: "center" }}>
-      <div style={{ maxWidth: 720, margin: "0 auto", width: "100%" }}>
-        <p style={sectionLabel}>Graphic Design Studio</p>
-        <h1 className="hero-heading">Great design<br />begins with<br /><span style={{ color: COLORS.rust }}>listening</span></h1>
-        <div style={accentLine} />
-        <p style={{ ...bodyText, marginBottom: 40 }}>Helping small businesses bring their ideas to life through clear, professional visuals that reflect who they are and what they offer.</p>
-        <div className="hero-buttons">
+      <div style={{ maxWidth: 800, margin: "0 auto", width: "100%", textAlign: "center" }}>
+        <p style={{ ...sectionLabel, textAlign: "center" }}>Graphic Design Studio</p>
+        <h1 className="hero-heading" style={{ textAlign: "center" }}>Great design<br />begins with<br /><span style={{ color: COLORS.rust }}>listening</span></h1>
+        <div style={{ ...accentLine, margin: "0 auto 32px" }} />
+        <p style={{ ...bodyText, textAlign: "center", margin: "0 auto 40px", maxWidth: 600 }}>Helping small businesses bring their ideas to life through clear, professional visuals that reflect who they are and what they offer.</p>
+        <div className="hero-buttons" style={{ justifyContent: "center" }}>
           <button style={btnPrimary} onClick={() => { setPage("Portfolio"); window.scrollTo(0, 0); }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = COLORS.rustLight)}
             onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.rust)}>View Work</button>
