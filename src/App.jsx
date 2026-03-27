@@ -653,7 +653,7 @@ function PortfolioPage({ manifest, onProjectClick }) {
       <p style={{ ...sectionLabel, textAlign: "center" }}>Portfolio</p>
       <h1 className="section-heading" style={{ textAlign: "center" }}>Selected Work</h1>
       <div style={{ ...accentLine, margin: "0 auto 32px" }} />
-      <div className="filter-row">
+      <div className="filter-row" style={{ justifyContent: "center" }}>
         {filters.map((f) => (
           <button key={f} onClick={() => setActiveFilter(f)} style={{
             ...btnBase, padding: "10px 20px", fontSize: 12, borderRadius: 4,
