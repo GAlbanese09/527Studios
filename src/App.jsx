@@ -113,6 +113,10 @@ const responsiveCSS = `
   .filter-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 48px; }
   .hero-buttons { display: flex; gap: 16px; }
 
+  .featured-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .home-services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .home-about-grid { display: grid; grid-template-columns: 300px 1fr; gap: 64px; align-items: center; }
+
   @media (max-width: 1024px) {
     .services-grid { grid-template-columns: repeat(2, 1fr); }
     .about-grid { grid-template-columns: 1fr; }
@@ -121,6 +125,8 @@ const responsiveCSS = `
     .hero-bg-shape { display: none; }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
     .bento-grid { grid-template-columns: repeat(2, 1fr); }
+    .featured-cards-grid { grid-template-columns: repeat(2, 1fr); }
+    .home-services-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 768px) {
@@ -167,6 +173,9 @@ const responsiveCSS = `
     .filter-row { gap: 8px; }
     .hero-buttons { flex-direction: column; gap: 12px; }
     .hero-buttons button { width: 100%; }
+    .featured-cards-grid { grid-template-columns: 1fr; }
+    .home-services-grid { grid-template-columns: 1fr; }
+    .home-about-grid { grid-template-columns: 1fr; gap: 40px; }
   }
 `;
 
@@ -205,7 +214,7 @@ function Navigation({ currentPage, setPage }) {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const pages = ["Home", "Portfolio", "About", "Services", "Store", "FAQ", "Contact"];
+  const pages = ["Home", "Portfolio", "FAQ", "Contact"];
 
   return (
     <>
@@ -410,7 +419,7 @@ function HeroSection({ setPage }) {
                 onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.rust)}>View Work</button>
               <button style={btnOutline} onClick={() => { setPage("Contact"); window.scrollTo(0, 0); }}
                 onMouseEnter={(e) => { e.target.style.backgroundColor = COLORS.charcoal; e.target.style.color = COLORS.white; }}
-                onMouseLeave={(e) => { e.target.style.backgroundColor = "transparent"; e.target.style.color = COLORS.charcoal; }}>Get in Touch</button>
+                onMouseLeave={(e) => { e.target.style.backgroundColor = "transparent"; e.target.style.color = COLORS.charcoal; }}>Contact Me</button>
             </div>
           </div>
           <div className="hero-right" style={{ position: "relative" }}>
@@ -443,38 +452,186 @@ function FeaturedWork({ setPage, manifest, onProjectClick }) {
   if (featured.length === 0) return null;
   return (
     <section className="section-padding" style={{ maxWidth: 1280, margin: "0 auto", paddingTop: 80 }}>
-      <p style={sectionLabel}>Selected Work</p>
-      <div className="featured-header" style={{ marginBottom: 48 }}>
-        <h2 className="section-heading" style={{ marginBottom: 0 }}>FEATURED PROJECTS</h2>
-        <button style={{ ...btnBase, color: COLORS.rust, padding: 0, border: "none", background: "none" }}
-          onClick={() => { setPage("Portfolio"); window.scrollTo(0, 0); }}>View All →</button>
+      <div style={{ textAlign: "center", marginBottom: 56 }}>
+        <p style={{ ...sectionLabel, textAlign: "center" }}>Selected Work</p>
+        <h2 className="section-heading" style={{ marginBottom: 0 }}>FEATURED WORK</h2>
       </div>
-      <div className="bento-grid">
-        {featured.map((p) => <ProjectCard key={p.id} project={p} onClick={onProjectClick} />)}
+      <div className="featured-cards-grid">
+        {featured.slice(0, 3).map((p) => (
+          <FeaturedCard key={p.id} project={p} onClick={() => onProjectClick && onProjectClick(p)} />
+        ))}
+      </div>
+      <div style={{ textAlign: "center", marginTop: 56 }}>
+        <button style={btnOutline} onClick={() => setPage("Portfolio")}
+          onMouseEnter={(e) => { e.target.style.backgroundColor = COLORS.charcoal; e.target.style.color = COLORS.white; }}
+          onMouseLeave={(e) => { e.target.style.backgroundColor = "transparent"; e.target.style.color = COLORS.charcoal; }}>View Portfolio</button>
       </div>
     </section>
   );
 }
 
-function ServicesPreview({ setPage, manifest }) {
+function FeaturedCard({ project, onClick }) {
+  const [hovered, setHovered] = useState(false);
+  const firstTag = (project.tags || [])[0] || "";
+  const bg = firstTag.includes("Brand") ? COLORS.sage : firstTag.includes("Editorial") ? COLORS.rust : COLORS.warmTan;
+  const hasCover = !!project.coverImage;
   return (
-    <section style={{ backgroundColor: COLORS.charcoal }} className="services-dark-padding">
+    <div
+      style={{
+        backgroundColor: COLORS.offWhite, borderRadius: 8, overflow: "hidden", cursor: "pointer",
+        border: `1px solid ${COLORS.lightGray}`,
+        transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease",
+        transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        boxShadow: hovered ? "0 16px 48px rgba(0,0,0,0.10)" : "0 2px 12px rgba(0,0,0,0.04)",
+      }}
+      onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
+    >
+      <div style={{
+        width: "100%", aspectRatio: "16/10", backgroundColor: bg,
+        backgroundImage: hasCover ? `url(${encodeURI(project.coverImage)})` : undefined,
+        backgroundSize: "cover", backgroundPosition: "center",
+        position: "relative",
+      }}>
+        {!hasCover && (
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.8)", fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, letterSpacing: "0.05em" }}>{project.title}</div>
+        )}
+      </div>
+      <div style={{ padding: "20px 24px 24px" }}>
+        <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 18, color: COLORS.charcoal, marginBottom: 8 }}>{project.title}</h3>
+        {project.description && (
+          <p style={{ fontSize: 14, color: COLORS.medGray, lineHeight: 1.6, marginBottom: 12, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{project.description}</p>
+        )}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {(project.tags || []).map((tag) => (
+            <span key={tag} style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.medGray }}>{tag}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ServicesPreview({ setPage, manifest }) {
+  const iconColors = [COLORS.sage, COLORS.rust, COLORS.warmTan, COLORS.charcoal];
+  return (
+    <section className="section-padding" style={{ backgroundColor: COLORS.offWhite }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-        <p style={{ ...sectionLabel, color: COLORS.rustLight }}>What I Do</p>
-        <h2 className="section-heading" style={{ color: COLORS.cream, marginBottom: 56 }}>SERVICES</h2>
-        <div className="services-grid">
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <p style={{ ...sectionLabel, textAlign: "center" }}>What I Do</p>
+          <h2 className="section-heading">SERVICES</h2>
+        </div>
+        <div className="home-services-grid">
           {(manifest.services || []).map((s, i) => (
-            <div key={i} style={{ padding: "32px 24px", borderTop: `3px solid ${COLORS.rust}`, backgroundColor: "rgba(255,255,255,0.03)", borderRadius: "0 0 8px 8px" }}>
-              <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: COLORS.cream, marginBottom: 8 }}>{s.name}</h3>
-              <p style={{ fontSize: 14, color: COLORS.warmTan, lineHeight: 1.6, marginBottom: 16 }}>{s.description}</p>
-              <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.rust }}>{s.price}</span>
+            <div key={i} style={{ textAlign: "center", padding: "32px 20px", backgroundColor: COLORS.white, borderRadius: 8, border: `1px solid ${COLORS.lightGray}` }}>
+              <div style={{
+                width: 52, height: 52, borderRadius: "50%", backgroundColor: iconColors[i % iconColors.length],
+                display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px",
+                color: COLORS.white, fontFamily: "'Bebas Neue', sans-serif", fontSize: 22,
+              }}>{s.name.charAt(0)}</div>
+              <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 18, color: COLORS.charcoal, marginBottom: 8 }}>{s.name}</h3>
+              <p style={{ fontSize: 14, color: COLORS.medGray, lineHeight: 1.6 }}>{s.description}</p>
             </div>
           ))}
         </div>
-        <div style={{ textAlign: "center", marginTop: 48 }}>
-          <button style={btnPrimary} onClick={() => { setPage("Services"); window.scrollTo(0, 0); }}
+        <div style={{ textAlign: "center", marginTop: 56 }}>
+          <button style={btnPrimary} onClick={() => setPage("Services")}
             onMouseEnter={(e) => (e.target.style.backgroundColor = COLORS.rustLight)}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.rust)}>View All Services</button>
+            onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.rust)}>View Services</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AboutPreview({ manifest }) {
+  const about = manifest.about || FALLBACK.about;
+  const firstBio = (about.bio || [])[0] || "";
+  return (
+    <section className="section-padding" style={{ maxWidth: 1280, margin: "0 auto" }}>
+      <div className="home-about-grid">
+        <div style={{ width: "100%", aspectRatio: "3/4", backgroundColor: COLORS.warmTan, borderRadius: 12, overflow: "hidden", position: "relative", boxShadow: "0 16px 48px rgba(0,0,0,0.08)" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 5, backgroundColor: COLORS.rust }} />
+          {about.headshot ? (
+            <img src={encodeURI(about.headshot)} alt="James Albanese" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ fontSize: 18, fontFamily: "'DM Sans', sans-serif", color: COLORS.medGray }}>Photo</div>
+            </div>
+          )}
+        </div>
+        <div>
+          <p style={sectionLabel}>About 527 Studios</p>
+          <h2 className="section-heading"><span style={{ color: COLORS.rust }}>GREAT</span> DESIGN<br />BEGINS WITH LISTENING</h2>
+          <div style={accentLine} />
+          <p style={{ ...bodyText, marginBottom: 24 }}>{firstBio}</p>
+          {about.quote && (
+            <p style={{ fontFamily: "'DM Serif Display', serif", fontSize: 18, fontStyle: "italic", lineHeight: 1.6, color: COLORS.charcoal, borderLeft: `3px solid ${COLORS.rust}`, paddingLeft: 20, marginBottom: 24 }}>
+              {about.quote}
+            </p>
+          )}
+          <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginTop: 32 }}>
+            {[
+              { label: "Location", value: about.location || "Altamonte Springs, FL" },
+              { label: "Specialties", value: (about.specialties || []).slice(0, 3).join(", ") },
+            ].map((item) => (
+              <div key={item.label}>
+                <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: COLORS.rust, marginBottom: 4 }}>{item.label}</div>
+                <div style={{ fontSize: 14, color: COLORS.medGray }}>{item.value}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FAQPreview({ setPage, manifest }) {
+  const faqs = (manifest.faq || []).slice(0, 3);
+  const [openId, setOpenId] = useState(null);
+  if (faqs.length === 0) return null;
+  return (
+    <section className="section-padding" style={{ backgroundColor: COLORS.offWhite }}>
+      <div style={{ maxWidth: 800, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <p style={{ ...sectionLabel, textAlign: "center" }}>Common Questions</p>
+          <h2 className="section-heading">FREQUENTLY ASKED<br /><span style={{ color: COLORS.rust }}>QUESTIONS</span></h2>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {faqs.map((faq) => {
+            const isOpen = openId === faq.id;
+            return (
+              <div key={faq.id} style={{ borderBottom: `1px solid ${COLORS.lightGray}` }}>
+                <button
+                  onClick={() => setOpenId(isOpen ? null : faq.id)}
+                  style={{
+                    width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "24px 0", background: "none", border: "none", cursor: "pointer",
+                    fontFamily: "'DM Sans', sans-serif", textAlign: "left",
+                  }}
+                >
+                  <span style={{ fontSize: 18, fontWeight: 600, color: COLORS.charcoal, paddingRight: 24 }}>{faq.question}</span>
+                  <span style={{
+                    fontSize: 24, color: COLORS.rust, flexShrink: 0, fontWeight: 300,
+                    transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+                    transition: "transform 0.3s ease",
+                  }}>+</span>
+                </button>
+                <div style={{
+                  maxHeight: isOpen ? 500 : 0, overflow: "hidden",
+                  transition: "max-height 0.3s ease, padding 0.3s ease",
+                  paddingBottom: isOpen ? 24 : 0,
+                }}>
+                  <p style={{ fontSize: 15, lineHeight: 1.7, color: COLORS.medGray }}>{faq.answer}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ textAlign: "center", marginTop: 40 }}>
+          <button style={{ ...btnBase, color: COLORS.rust, padding: 0, border: "none", background: "none" }}
+            onClick={() => setPage("FAQ")}>View All FAQs →</button>
         </div>
       </div>
     </section>
@@ -499,7 +656,16 @@ function CTASection({ setPage }) {
 // ==================== PAGES ====================
 
 function HomePage({ setPage, manifest, onProjectClick }) {
-  return (<><HeroSection setPage={setPage} /><FeaturedWork setPage={setPage} manifest={manifest} onProjectClick={onProjectClick} /><ServicesPreview setPage={setPage} manifest={manifest} /><CTASection setPage={setPage} /></>);
+  return (
+    <>
+      <HeroSection setPage={setPage} />
+      <FeaturedWork setPage={setPage} manifest={manifest} onProjectClick={onProjectClick} />
+      <ServicesPreview setPage={setPage} manifest={manifest} />
+      <AboutPreview manifest={manifest} />
+      <FAQPreview setPage={setPage} manifest={manifest} />
+      <CTASection setPage={setPage} />
+    </>
+  );
 }
 
 function PortfolioPage({ manifest, onProjectClick }) {
