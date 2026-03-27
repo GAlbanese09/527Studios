@@ -995,7 +995,7 @@ function FAQPage({ manifest }) {
 
 function ContactPage({ manifest }) {
   const about = manifest.about || FALLBACK.about;
-  const [formData, setFormData] = useState({ name: "", email: "", project: "", message: "" });
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", project: "", message: "" });
   const [status, setStatus] = useState("idle");
   const [touched, setTouched] = useState({});
   const inputStyle = { width: "100%", padding: "12px 16px", fontSize: 15, fontFamily: "'DM Sans', sans-serif", border: `1.5px solid ${COLORS.lightGray}`, borderRadius: 4, backgroundColor: COLORS.white, color: COLORS.charcoal, outline: "none", boxSizing: "border-box" };
@@ -1019,6 +1019,7 @@ function ContactPage({ manifest }) {
           access_key: "68804e5c-1ddb-4a65-9ed5-14323d4d90ae",
           name: formData.name,
           email: formData.email,
+          phone: formData.phone,
           project_type: formData.project,
           message: formData.message,
           subject: `New inquiry from ${formData.name} — 527 Studios`,
@@ -1029,7 +1030,7 @@ function ContactPage({ manifest }) {
       const data = await res.json();
       if (data.success) {
         setStatus("success");
-        setFormData({ name: "", email: "", project: "", message: "" });
+        setFormData({ name: "", email: "", phone: "", project: "", message: "" });
         setTouched({});
         setTimeout(() => setStatus("idle"), 5000);
       } else {
@@ -1062,7 +1063,7 @@ function ContactPage({ manifest }) {
         <div style={{ padding: "40px 24px", backgroundColor: COLORS.offWhite, border: `1px solid ${COLORS.lightGray}`, borderRadius: 8 }}>
           <input type="hidden" name="botcheck" value="" />
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            {[{ key: "name", label: "Name *", type: "text", ph: "Your name" }, { key: "email", label: "Email *", type: "email", ph: "your@email.com" }, { key: "project", label: "Project Type", type: "text", ph: "Brand Identity, Editorial, etc." }].map((f) => (
+            {[{ key: "name", label: "Name *", type: "text", ph: "Your name" }, { key: "email", label: "Email *", type: "email", ph: "your@email.com" }, { key: "phone", label: "Phone", type: "tel", ph: "(555) 555-5555" }, { key: "project", label: "Project Type", type: "text", ph: "Brand Identity, Editorial, etc." }].map((f) => (
               <div key={f.key}>
                 <label style={labelStyle}>{f.label}</label>
                 <input type={f.type} placeholder={f.ph} value={formData[f.key]} onChange={(e) => setFormData({ ...formData, [f.key]: e.target.value })} style={{ ...inputStyle, borderColor: fieldBorder(f.key) }}
